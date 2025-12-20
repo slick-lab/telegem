@@ -10,15 +10,15 @@ Modern, blazing-fast async Telegram Bot API for Ruby - Inspired by Telegraf, bui
 
 ✨ Features
 
-· ⚡ True Async I/O - Built on async/await, not blocking threads
-· 🎯 Telegraf-style DSL - Familiar API for JavaScript developers
-· 🔌 Middleware System - Compose behavior like Express.js
-· 💾 Session Management - Redis, memory, file stores
-· 🧙 Scene System - Wizard conversations (multi-step flows)
-· ⌨️ Keyboard DSL - Clean markup builders
-· 🌐 Webhook Server - Production-ready async HTTP server
-· 🏗️ Type-Safe Objects - Ruby classes for all Telegram types
-· 📦 Zero Dependencies (except async gems)
+- ⚡ True Async I/O - Built on async/await, not blocking threads
+- 🎯 Telegraf-style DSL - Familiar API for JavaScript developers
+- 🔌 Middleware System - Compose behavior like Express.js
+- 💾 Session Management - Redis, memory, file stores
+- 🧙 Scene System - Wizard conversations (multi-step flows)
+- ⌨️ Keyboard DSL - Clean markup builders
+- 🌐 Webhook Server - Production-ready async HTTP server
+- 🏗️ Type-Safe Objects - Ruby classes for all Telegram types
+-📦 Zero Dependencies (except async gems)
 
 🚀 Installation
 
@@ -248,19 +248,19 @@ gem install ./telegem-0.1.0.gem
 
 Code Style
 
-· Follow standard Ruby style (RuboCop)
-· Write async code (no blocking I/O)
-· Add tests for new features
-· Update documentation
+- Follow standard Ruby style (RuboCop)
+- Write async code (no blocking I/O)
+- Add tests for new features
+-Update documentation
 
 📖 API Documentation
 
 Full API docs available in the docs/ directory:
 
-· Context API - All ctx. methods
-· Middleware Guide - Building custom middleware
-· Session Stores - Redis, file, custom stores
-· Webhook Deployment - Production deployment guide
+- Context API - All ctx. methods
+- Middleware Guide - Building custom middleware
+- Session Stores - Redis, file, custom stores
+- Webhook Deployment - Production deployment guide
 
 🚀 Performance
 
@@ -302,10 +302,10 @@ end
 
 🔗 Links
 
-· GitLab Repository: https://gitlab.com/ruby-telegem/telegem
-· Issue Tracker: https://gitlab.com/ruby-telegem/telegem/-/issues
-· RubyGems: https://rubygems.org/gems/telegem
-· Telegram Bot API: https://core.telegram.org/bots/api
+- GitLab Repository: https://gitlab.com/ruby-telegem/telegem
+- Issue Tracker: https://gitlab.com/ruby-telegem/telegem/-/issues
+- RubyGems: https://rubygems.org/gems/telegem
+- Telegram Bot API: https://core.telegram.org/bots/api
 
 📄 License
 
