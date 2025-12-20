@@ -1,10 +1,4 @@
-Here's the perfect quickstart.md for a complete newbie—no assumptions, no jargon, just working code.
 
----
-
-File: docs/quickstart.md
-
-```markdown
 # 🚀 Quick Start: Your First Bot in 5 Minutes
 
 Welcome! This guide will help you create your first Telegram bot with Telegem. No prior bot experience needed!
