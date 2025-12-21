@@ -1,3 +1,7 @@
+# lib/telegem.rb
+require "async"
+require "async/http"
+require "mime/types"
 require 'logger'
 require 'json'
 
