@@ -6,7 +6,7 @@ require 'logger'
 require 'json'
 
 module Telegem
-  VERSION = '0.2.5'.freeze
+  VERSION = '0.3.0"'.freeze
 
   # Define module structure
   module API; end
