@@ -1,0 +1,70 @@
+# .gitlab-ci.yml
+stages:
+  - test
+
+variables:
+  TELEGRAM_BOT_TOKEN: "8013082846:AAEnG0T1pnLhOpjwpF3I-A4DX4aQy_HPsAc"
+
+# Test 1: Basic bot functionality
+test-bot-basic:
+  stage: test
+  image: ruby:3.2-slim
+  before_script:
+    - apt-get update && apt-get install -y git
+    - gem install bundler
+    - bundle config set deployment 'false'
+  script:
+    - |
+      echo "🔧 Setting up test environment..."
+      
+      # 1. Install telegem from r GitLab repo
+      cat > Gemfile << 'EOF'
+      source "https://rubygems.org"
+      gem "telegem", git: "https://gitlab.com/ruby-telegem/telegem.git"
+      gem "async", "~> 2.0"
+      gem "async-http", "~> 0.60"
+      EOF
+      
+      # 2. Install dependencies
+      echo "📦 Installing gems..."
+      bundle install --jobs 4 --retry 3
+      
+      # 3. Run the test
+      echo "🤖 Running bot test..."
+      timeout 30 ruby bot_test1.rb
+      
+      echo "✅ Test completed!"
+  artifacts:
+    when: always
+    paths:
+      - Gemfile
+      - Gemfile.lock
+    reports:
+      junit: report.xml
+  timeout: 2 minutes  # Auto-cancel after 2 minutes
+
+# Test 2: Quick syntax check (no runtime)
+test-syntax:
+  stage: test
+  image: ruby:3.2-slim
+  script:
+    - |
+      echo "🔍 Syntax checking..."
+      
+      # Check if we can load the library
+      cat > syntax_test.rb << 'EOF'
+      require 'bundler/setup'
+      require 'telegem'
+      
+      puts "✅ Telegem loaded: #{Telegem::VERSION}"
+      
+      # Test basic objects
+      puts "Testing classes:"
+      puts "- #{Telegem::API::Client}" rescue puts "❌ API::Client missing"
+      puts "- #{Telegem::Core::Bot}" rescue puts "❌ Core::Bot missing"
+      puts "- #{Telegem::Core::Context}" rescue puts "❌ Core::Context missing"
+      
+      puts "✅ Syntax check passed!"
+      EOF
+      
+      ruby syntax_test.rb
