@@ -38,3 +38,6 @@ module Telegem
       def empty?
         @middleware.empty?
       end
+    end 
+  end 
+end 
