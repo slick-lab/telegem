@@ -4,7 +4,7 @@ Gem::Specification.new do |spec|
   
   # Read version from lib/telegem.rb
   version_file = File.read('lib/telegem.rb').match(/VERSION\s*=\s*['"]([^'"]+)['"]/)
-  spec.version = version_file ? version_file[1] : "0.1.2"
+  spec.version = version_file ? version_file[1] : "0.1.3"
   
   spec.authors       = ["Phantom"]
   spec.email         = ["ynghosted@icloud.com"]
