@@ -1,4 +1,5 @@
 require 'logger'
+require 'json'
 
 module Telegem
   VERSION = '0.1.6'.freeze
