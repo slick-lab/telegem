@@ -1,6 +1,7 @@
-# lib/telegem.rb
+require 'logger'
+
 module Telegem
-  VERSION = '0.1.5'.freeze
+  VERSION = '0.1.6'.freeze
 
   # Define module structure
   module API; end
