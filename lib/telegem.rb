@@ -1,6 +1,6 @@
 # lib/telegem.rb
 module Telegem
-  VERSION = '0.1.3'.freeze
+  VERSION = '0.1.4'.freeze
 
   # Define module structure
   module API; end
