@@ -47,3 +47,6 @@
                 @store.empty?
               end
             end 
+          end 
+        end 
+      end 
