@@ -1,7 +1,7 @@
 # lib/core/memory_store.rb - Generic in-memory store for caching/rate limiting
 module Telegem
   module Core
-    class MemoryStore
+    class CacheStore
       def initialize(default_ttl: 300) # 5 minutes default
         @store = {}
         @ttls = {}
