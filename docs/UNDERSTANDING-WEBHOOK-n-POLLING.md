@@ -105,15 +105,16 @@ bot.start_polling
 
 📊 Polling vs Webhooks: Side-by-Side Comparison
 
- Polling 🍕 Webhooks 🚚
-How it works Bot asks Telegram: "New messages?" Telegram sends messages to bot
-Setup bot.start_polling() Server + set_webhook()
-Best for Development, testing Production, high traffic
-Speed Up to 1-second delay Instant delivery
-SSL Required? ❌ No ✅ Yes (Telegram requires HTTPS)
-Server Needed? ❌ No ✅ Yes
-Battery/CPU ⚠️ Uses more (always checking) ✅ Efficient (sleeps until delivery)
-Can Switch? ✅ Yes (hot-swap) ✅ Yes (hot-swap)
+ |Polling 🍕| Webhooks 🚚 |
+ | ------- | ------- |
+ | Bot asks Telegram: "New messages?" | Telegram sends messages to bot |
+ | Setup bot.start_polling() | Server + set_webhook() |
+ | Best for Development, testing  | Production, high traffic | 
+| Speed Up to 1-second delay | Instant delivery |
+| SSL Required? ❌ No | ✅ Yes (Telegram requires HTTPS) |
+| Server Needed? ❌ No | ✅ Yes | 
+| Battery/CPU ⚠️ Uses more (always checking) | ✅ Efficient (sleeps until delivery) |
+| Can Switch? ✅ Yes (hot-swap) | ✅ Yes (hot-swap) |
 
 🎯 When to Use Which?
 
