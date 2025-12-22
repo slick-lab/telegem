@@ -87,13 +87,14 @@ Example bot with interactive keyboard and scene-based ordering flow
 
 vs. Other Ruby Telegram Libraries
 
-Feature Telegem telegram-bot-ruby Others
-Async Architecture ✅ True async/await ❌ Thread-based ❌ Blocking
-Middleware System ✅ Express.js-style ❌ Limited ❌ None
-Scene Management ✅ Built-in ❌ Manual ❌ None
-Session Stores ✅ Multiple ❌ Basic ❌ None
-Modern DSL ✅ Clean & fluent ❌ Verbose ⚠️ Varies
-Performance ✅ Non-blocking ⚠️ OK ❌ Poor
+| Telegem | telegram-bot-ruby |
+| ------ | ------ |
+|   fast async      |  multiple thread      |
+|    non blocking request     |    slow thread based     |
+| clean telegraf dsl    |  no dsl |
+| scene management.   | verbose |
+| middleware |  raw json | 
+| clean markup dsl|.      | 
 
 Perfect For:
 
