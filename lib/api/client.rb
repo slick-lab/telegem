@@ -14,7 +14,7 @@ module Telegem
         
         # HTTPX with persistent connections and proper async support
         @http = HTTPX.plugin(:persistent)
-                     .plugin(:retries, max_retries: 3, retry_on: [Timeout::Error, HTTPX::Error])
+                     .plugin(:retries, max_retries: 3)
                      .with(
                        timeout: { 
                          connect_timeout: 10,
