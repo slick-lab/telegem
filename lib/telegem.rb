@@ -1,4 +1,6 @@
 # lib/telegem.rb - MAIN ENTRY POINT
+require 'logger'
+require 'json'
 module Telegem
   VERSION = "1.0.0".freeze
 end
