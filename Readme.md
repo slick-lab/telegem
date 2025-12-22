@@ -10,15 +10,15 @@ Blazing-fast, modern Telegram Bot framework for Ruby. Inspired by Telegraf.js, b
 
 ✨ Features
 
-· ⚡ True Async I/O - Built on async gem, not blocking threads
-· 🎯 Telegraf-style DSL - Familiar API for JavaScript developers
-· 🔌 Middleware System - Compose behavior like Express.js
-· 🧙 Scene System - Multi-step conversations (wizards/forms)
-· 💾 Session Management - Redis, memory, or custom stores
-· ⌨️ Keyboard DSL - Clean markup builders with fluent API
-· 🌐 Webhook Server - Production-ready async HTTP server
-· 🏗️ Type-Safe Objects - Ruby classes for all Telegram types
-· 📦 Minimal Dependencies - Just async gems + mime-types
+- ⚡ True httpx(Async) I/O - Built on async gem, not blocking threads
+- 🎯 Telegraf-style DSL - Familiar API for JavaScript developers
+- 🔌 Middleware System - Compose behavior like Express.js
+- 🧙 Scene System - Multi-step conversations (wizards/forms)
+- 💾 Session Management - Redis, memory, or custom stores
+- ⌨️ Keyboard DSL - Clean markup builders with fluent API
+- 🌐 Webhook Server - Production-ready async HTTP server
+- 🏗️ Type-Safe Objects - Ruby classes for all Telegram types
+- 📦 Minimal Dependencies - Just async gems + mime-types
 
 ---
 
@@ -194,8 +194,7 @@ server = bot.webhook_server(
 )
 
 # Set webhook automatically
-Async do
-  await bot.set_webhook(
+  bot.set_webhook(
     url: "https://#{ENV['DOMAIN']}/webhook/#{bot.token}",
     max_connections: 40
   )
@@ -302,7 +301,7 @@ Coming Soon
 
 In Progress
 
-- Async Core - Non-blocking I/O
+- httpx(Async) - Non-blocking I/O
 - Scene System - Multi-step conversations
 - Middleware Pipeline - Extensible architecture
 - Webhook Server - Production deployment
