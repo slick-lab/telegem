@@ -9,7 +9,7 @@ module Telegem
 
       def initialize(bot, port: nil, host: '0.0.0.0', logger: nil)
         @bot = bot
-        @port = port
+        @port = port || ENV['PORT'] || 1000
         @host = host
         @logger = logger || Logger.new($stdout)
         @server = nil
