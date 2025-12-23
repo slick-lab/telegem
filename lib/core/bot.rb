@@ -80,7 +80,7 @@ module Telegem
       end
 
       def webhook(app = nil, &block)
-        require 'telegem/webhook/server'
+        require 'webhook/server'
         
         if block_given?
           Webhook::Server.new(self, &block)
