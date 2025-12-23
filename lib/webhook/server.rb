@@ -7,7 +7,7 @@ module Telegem
     class Server
       attr_reader :bot, :port, :host, :logger, :server, :running
 
-      def initialize(bot, port: 3000, host: '0.0.0.0', logger: nil)
+      def initialize(bot, port: nil, host: '0.0.0.0', logger: nil)
         @bot = bot
         @port = port
         @host = host
