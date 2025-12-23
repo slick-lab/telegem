@@ -52,7 +52,7 @@ bot.command('start') do |ctx|
 end
 
 # Step 1: Start your "delivery address" (server)
-server = bot.webhook_server(port: 3000)
+server = bot.webhook(port: 3000)
 server.run
 
 # Step 2: Tell Telegram your address
@@ -90,7 +90,7 @@ bot.command('webhook') do |ctx|
   # Switch TO webhook
   bot.shutdown           # Stop current mode
   
-  server = bot.webhook_server(port: 3000)
+  server = bot.webhook(port: 3000)
   server.run
   
   # For demo, use ngrok URL (get yours at ngrok.com)
@@ -163,7 +163,7 @@ bot.command('info') do |ctx|
 end
 
 # Start server
-server = bot.webhook_server(port: 3000)
+server = bot.webhook(port: 3000)
 server.run
 
 puts "🚀 Server running! Set webhook to:"
