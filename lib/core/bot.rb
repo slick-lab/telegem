@@ -79,7 +79,7 @@ module Telegem
         self
       end
 
-      def webhook(app = nil, &block)
+      def webhook(app = nil, port: nil, host: '0.0.0.0', logger: nil, &block)
         require 'webhook/server'
         
         if block_given?
