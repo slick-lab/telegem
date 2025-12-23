@@ -87,7 +87,7 @@ module Telegem
         elsif app
           Webhook::Middleware.new(self, app)
         else
-          Webhook::Server.new(self)
+          Webhook::Server.new(self, port: port, host: host, logger: logger)
         end
       end
 
