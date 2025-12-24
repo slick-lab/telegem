@@ -15,7 +15,7 @@ module Telegem
         timeout = options[:timeout] || 30
         
         @http = HTTPX.with(
-          timeout: timeout,
+          timeout: { request_timeout: @timeout},
           headers: {
             'Content-Type' => 'application/json'
           }
