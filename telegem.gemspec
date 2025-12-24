@@ -50,7 +50,7 @@ Gem::Specification.new do |spec|
     "changelog_uri" => "#{spec.homepage}/-/blob/main/CHANGELOG.md",
     "bug_tracker_uri" => "#{spec.homepage}/-/issues",
     "documentation_uri" => "#{spec.homepage}/-/blob/main/README.md",
-    "rubygems_mfa_required" => "true"
+    "rubygems_mfa_required" => "false"
   }
   
   # Post-install message
