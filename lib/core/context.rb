@@ -263,12 +263,12 @@ module Telegem
 
       # Keyboard helpers
       def keyboard(&block)
-        require 'telegem/markup/keyboard'
+        require 'markup/keyboard'
         Telegem::Markup.keyboard(&block)
       end
 
       def inline_keyboard(&block)
-        require 'telegem/markup/keyboard'
+        require 'markup/keyboard'
         Telegem::Markup.inline(&block)
       end
 
