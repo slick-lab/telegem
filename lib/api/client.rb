@@ -12,7 +12,7 @@ module Telegem
       def initialize(token, **options)
         @token = token
         @logger = options[:logger] || Logger.new($stdout)
-        timeout = options[:timeout] || 30
+        @timeout = options[:timeout] || 30
         
         @http = HTTPX.with(
           timeout: { request_timeout: @timeout},
