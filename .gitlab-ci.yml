@@ -2,26 +2,39 @@
 # To contribute improvements to CI/CD templates, please follow the Development guide at:
 # https://docs.gitlab.com/development/cicd/templates/
 # This specific template is located at:
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Verify/Accessibility.gitlab-ci.yml
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Pages/Jekyll.gitlab-ci.yml
 
-# Read more about the feature here: https://docs.gitlab.com/ci/testing/accessibility_testing/
-stages:
-  - build
-  - test
-  - deploy
-  - accessibility
+default:
+  # Template project: https://gitlab.com/pages/jekyll
+  # Docs: https://docs.gitlab.com/ee/pages/
+  image: ruby:3.1.2
+  before_script:
+    - gem install bundler:2.2.22
+    - bundle install
 
-a11y:
-  stage: accessibility
-  image: "$CI_TEMPLATE_REGISTRY_HOST/gitlab-org/ci-cd/accessibility:6.2.3"
+variables:
+  JEKYLL_ENV: production
+  LC_ALL: C.UTF-8
+
+test:
+  stage: test
   script:
-    - /gitlab-accessibility.sh "$a11y_urls"
-  allow_failure: true
+    - bundle exec jekyll build -d test
   artifacts:
-    when: always
-    expose_as: 'Accessibility Reports'
-    paths: ['reports/']
-    reports:
-      accessibility: reports/gl-accessibility.json
-  rules:
-    - if: $a11y_urls
+    paths:
+      - test
+  except:
+    variables:
+      - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+pages:
+  stage: deploy
+  script:
+    - bundle exec jekyll build -d public
+  artifacts:
+    paths:
+      - public
+  only:
+    variables:
+      - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  environment: production
