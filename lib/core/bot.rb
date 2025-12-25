@@ -171,35 +171,25 @@ module Telegem
       end
       
       def fetch_updates
-        params = {
-          timeout: @polling_options[:timeout],
-          limit: @polling_options[:limit]
-        }
-        params[:offset] = @offset if @offset
-        params[:allowed_updates] = @polling_options[:allowed_updates] if @polling_options[:allowed_updates]
-        
-        begin
-          request = @api.get_updates(params)
-          
-          if request.respond_to?(:wait)
-            response = request.wait
-            
-            if response.respond_to?(:status) && response.status == 200
-              json = response.json
-              return json if json && json.is_a?(Hash)
-            else
-              @logger.error("HTTP Error: #{response.status}") if response.respond_to?(:status)
-            end
-          else
-            @logger.error("API didn't return a waitable request: #{request.class}")
-          end
-        rescue => e
-          @logger.error("Error fetching updates: #{e.class}: #{e.message}")
-        end
-        
-        nil
-      end
-      
+  params = {
+    timeout: @polling_options[:timeout],
+    limit: @polling_options[:limit]
+  }
+  params[:offset] = @offset if @offset
+  params[:allowed_updates] = @polling_options[:allowed_updates] if @polling_options[:allowed_updates]
+  
+  @logger.debug("Fetching updates with offset: #{@offset}")
+  
+  # Simple direct call - no .wait
+  updates = @api.call!('getUpdates', params)
+  
+  if updates && updates.is_a?(Array)
+    @logger.debug("Got #{updates.length} updates")
+    return { 'ok' => true, 'result' => updates }
+  end
+  
+  nil
+end
       def handle_updates_response(api_response)
         updates = api_response['result'] || []
         
