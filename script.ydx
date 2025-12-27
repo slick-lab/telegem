@@ -1,6 +1,4 @@
-# GitLab Docs Generator - Beautiful CSS Edition
 
--code(
 #!/bin/bash
 # YDX to HTML Converter with Beautiful CSS
 
