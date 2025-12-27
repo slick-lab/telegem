@@ -1,0 +1,763 @@
+🎬 SCENE SYSTEM - COMPLETE GUIDE
+
+🎯 WHAT IS A SCENE?
+
+1). Scenes = Conversation Flows
+
+A Scene is a stateful conversation between your bot and a user. Think of it like a "mini-program" within your bot that guides users through multiple steps.
+
+-code(
+
+Example: Onboarding Scene
+
+User → /start
+Bot → "Welcome! What's your name?"
+User → "John"
+Bot → "Hi John! How old are you?"
+User → "25"
+Bot → "Great! What's your email?"
+User → "john@example.com"
+Bot → "✅ Registration complete!"
+)
+
+-note(Each "question→answer" is a step in the scene)
+
+2). Why Use Scenes?
+
+Without scenes:
+
+```text
+User: /start
+Bot: What's your name?
+User: (talks about weather) ⚠️ Bot confused!
+User: John
+Bot: ❓ What was the question again?
+```
+
+With scenes:
+
+```text
+User: /start
+Bot: What's your name? [SCENE:onboarding, STEP:ask_name]
+User: (talks about weather)
+Bot: (ignores, waits for name) [SCENE:onboarding, STEP:ask_name]
+User: John ✓
+Bot: Hi John! How old are you? [SCENE:onboarding, STEP:ask_age]
+```
+
+🚀 QUICK START
+
+3). Create Your First Scene
+
+-code(
+bot.scene(:onboarding) do
+
+Step 1: Ask for name
+
+step :ask_name do |ctx|
+ctx.reply("Welcome! What's your name?")
+end
+
+Step 2: Ask for age (runs after user responds)
+
+step :ask_age do |ctx|
+# Save name from previous step
+ctx.session[:name] = ctx.message.text
+ctx.reply("Hi #{ctx.session[:name]}! How old are you?")
+end
+
+Step 3: Ask for email
+
+step :ask_email do |ctx|
+ctx.session[:age] = ctx.message.text
+ctx.reply("Great! What's your email?")
+end
+
+Step 4: Finish
+
+step :finish do |ctx|
+ctx.session[:email] = ctx.message.text
+
+```
+ctx.reply("✅ Registration complete!")
+ctx.reply("Name: #{ctx.session[:name]}")
+ctx.reply("Age: #{ctx.session[:age]}")
+ctx.reply("Email: #{ctx.session[:email]}")
+
+# Exit the scene
+ctx.leave_scene
+```
+
+end
+end
+)
+
+4). Start the Scene
+
+-code(
+bot.command('start') do |ctx|
+
+Enter the onboarding scene
+
+ctx.enter_scene(:onboarding)
+
+Automatically runs :ask_name step
+
+end
+)
+
+-img(https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif wid=600 alt="Scene flow animation")
+
+🔧 SCENE BUILDING BLOCKS
+
+5). Scene Definition
+
+-code(
+bot.scene(:scene_id) do
+
+Configuration
+
+step :step_name do |ctx|
+# Step logic
+end
+
+step :another_step do |ctx|
+# More logic
+end
+end
+)
+
+6). Entering a Scene
+
+-code(
+
+Basic entry
+
+ctx.enter_scene(:onboarding)
+
+With starting step
+
+ctx.enter_scene(:auth, step: :password)
+
+With options
+
+ctx.enter_scene(:shopping,
+step: :select_category,
+data: { user_type: 'premium' }
+)
+)
+
+7). Scene Context
+
+Inside any step, you have access to:
+
+-code(
+
+Current scene info
+
+scene = ctx.current_scene
+scene.id        # :onboarding
+scene.current_step(ctx)  # :ask_name
+
+Scene-specific data
+
+ctx.scene_data[:temp] = "value"
+
+Session data (persists)
+
+ctx.session[:user_id] = ctx.user_id
+
+State data (temporary)
+
+ctx.state[:processing] = true
+)
+
+🎮 COMPLETE EXAMPLE: QUIZ BOT
+
+8). Quiz Scene Implementation
+
+-code(
+bot.scene(:quiz) do
+
+Setup when scene starts
+
+on_enter do |ctx|
+ctx.session[:score] = 0
+ctx.session[:question_num] = 1
+ctx.reply("🎮 QUIZ TIME! Get ready...")
+end
+
+Question 1
+
+step :question_1 do |ctx|
+ctx.reply("Question 1: What's 2 + 2?")
+ctx.reply("A) 3\nB) 4\nC) 5\nD) 22")
+end
+
+Handle answer to question 1
+
+step :answer_1 do |ctx|
+if ctx.message.text&.downcase == "b"
+ctx.session[:score] += 1
+ctx.reply("✅ Correct! Score: #{ctx.session[:score]}")
+else
+ctx.reply("❌ Wrong! It's B) 4")
+end
+
+```
+# Move to next question
+ctx.scene_data[:next_step] = :question_2
+```
+
+end
+
+Question 2
+
+step :question_2 do |ctx|
+ctx.session[:question_num] = 2
+ctx.reply("Question 2: Capital of France?")
+ctx.reply("A) London\nB) Berlin\nC) Paris\nD) Madrid")
+end
+
+Handle answer to question 2
+
+step :answer_2 do |ctx|
+if ctx.message.text&.downcase == "c"
+ctx.session[:score] += 1
+ctx.reply("✅ Correct! Score: #{ctx.session[:score]}")
+else
+ctx.reply("❌ Wrong! It's C) Paris")
+end
+
+```
+ctx.scene_data[:next_step] = :finish
+```
+
+end
+
+Finish quiz
+
+step :finish do |ctx|
+score = ctx.session[:score]
+total = 2
+
+```
+ctx.reply("📊 QUIZ COMPLETE!")
+ctx.reply("Your score: #{score}/#{total}")
+
+if score == total
+  ctx.reply("🏆 PERFECT! You're a genius!")
+elsif score >= 1
+  ctx.reply("👍 Good job!")
+else
+  ctx.reply("💪 Keep learning!")
+end
+
+ctx.leave_scene
+```
+
+end
+
+Cleanup when scene ends
+
+on_leave do |ctx|
+ctx.reply("Thanks for playing! 👋")
+# Clear session data if needed
+ctx.session.delete(:score)
+ctx.session.delete(:question_num)
+end
+end
+)
+
+-img(https://media.giphy.com/media/3o7abAHdYvZdBNnGZq/giphy.gif wid=600 alt="Quiz flow")
+
+🔄 STEP TRANSITIONS
+
+9). Moving Between Steps
+
+-code(
+bot.scene(:shopping) do
+step :browse do |ctx|
+ctx.reply("Browse products:")
+ctx.reply("1) Phone\n2) Laptop\n3) Headphones")
+end
+
+step :select_product do |ctx|
+choice = ctx.message.text
+
+```
+case choice
+when "1"
+  ctx.session[:product] = "Phone"
+  ctx.scene_data[:next_step] = :ask_quantity
+when "2"
+  ctx.session[:product] = "Laptop"
+  ctx.scene_data[:next_step] = :ask_quantity
+when "3"
+  ctx.session[:product] = "Headphones"
+  ctx.scene_data[:next_step] = :ask_quantity
+else
+  ctx.reply("Invalid choice, try again!")
+  # Stay in same step
+  ctx.scene_data[:next_step] = :browse
+end
+```
+
+end
+
+step :ask_quantity do |ctx|
+ctx.reply("How many #{ctx.session[:product]}s?")
+end
+
+step :confirm do |ctx|
+ctx.session[:quantity] = ctx.message.text.to_i
+total = ctx.session[:quantity] * 100  # Example price
+
+```
+ctx.reply("Order:")
+ctx.reply("Product: #{ctx.session[:product]}")
+ctx.reply("Quantity: #{ctx.session[:quantity]}")
+ctx.reply("Total: $#{total}")
+
+ctx.reply("Confirm? (yes/no)")
+```
+
+end
+
+step :process_order do |ctx|
+if ctx.message.text.downcase == "yes"
+ctx.reply("✅ Order placed!")
+# Process order...
+ctx.leave_scene
+else
+ctx.reply("Order cancelled.")
+ctx.leave_scene
+end
+end
+end
+)
+
+10). Manual Step Control
+
+-code(
+
+Jump to specific step
+
+ctx.current_scene.process_step(ctx, :ask_email)
+
+Reset to first step
+
+ctx.current_scene.reset(ctx)
+
+Check current step
+
+if ctx.current_scene.current_step(ctx) == :waiting_payment
+ctx.reply("Still waiting for payment...")
+end
+)
+
+🎨 ADVANCED PATTERNS
+
+11). Scene with Timeouts
+
+-code(
+bot.scene(:verification) do
+on_enter do |ctx|
+# Send verification code
+code = rand(1000..9999)
+ctx.session[:verify_code] = code
+ctx.session[:attempts] = 0
+ctx.session[:start_time] = Time.now
+
+```
+ctx.reply("Your code: #{code} (expires in 5 minutes)")
+```
+
+end
+
+step :wait_for_code do |ctx|
+# Check timeout
+if Time.now - ctx.session[:start_time] > 300  # 5 minutes
+ctx.reply("⏰ Code expired!")
+ctx.leave_scene
+return
+end
+
+```
+# Check attempts
+if ctx.session[:attempts] >= 3
+  ctx.reply("🚫 Too many attempts!")
+  ctx.leave_scene
+  return
+end
+
+# Verify code
+if ctx.message.text == ctx.session[:verify_code].to_s
+  ctx.reply("✅ Verified!")
+  ctx.leave_scene
+else
+  ctx.session[:attempts] += 1
+  remaining = 3 - ctx.session[:attempts]
+  ctx.reply("❌ Wrong code! #{remaining} attempts left")
+  # Stay in same step
+end
+```
+
+end
+end
+)
+
+12). Nested Scenes (Scene within Scene)
+
+-code(
+bot.scene(:main_menu) do
+step :show_menu do |ctx|
+keyboard = ctx.inline_keyboard do
+row { button "Profile", callback_data: "profile" }
+row { button "Settings", callback_data: "settings" }
+row { button "Help", callback_data: "help" }
+end
+ctx.reply("Main Menu:", reply_markup: keyboard)
+end
+
+step :handle_choice do |ctx|
+case ctx.data
+when "profile"
+# Enter profile scene but remember to come back
+ctx.scene_data[:return_to] = :main_menu
+ctx.enter_scene(:profile)
+when "settings"
+ctx.scene_data[:return_to] = :main_menu
+ctx.enter_scene(:settings)
+when "help"
+ctx.reply("Help information...")
+ctx.current_scene.process_step(ctx, :show_menu)
+end
+end
+end
+
+bot.scene(:profile) do
+step :show_profile do |ctx|
+ctx.reply("Your profile...")
+ctx.reply("[Back to menu]")
+end
+
+step :handle_back do |ctx|
+if ctx.message.text&.include?("back")
+# Return to main menu
+return_to = ctx.scene_data[:return_to] || :main_menu
+ctx.enter_scene(return_to)
+end
+end
+end
+)
+
+-img(https://media.giphy.com/media/xT5LMHxhOfscxPfIfm/giphy.gif wid=600 alt="Nested scenes")
+
+🔧 SCENE UTILITIES
+
+13). Scene Middleware
+
+-code(
+
+Add middleware to all scenes
+
+bot.use do |ctx, next_middleware|
+if ctx.current_scene
+# Log scene activity
+ctx.logger.info("Scene: #{ctx.current_scene.id}, Step: #{ctx.current_scene.current_step(ctx)}")
+
+```
+# Add timeout checking
+if ctx.scene_data[:timeout] && Time.now > ctx.scene_data[:timeout]
+  ctx.reply("Session expired!")
+  ctx.leave_scene
+  return
+end
+```
+
+end
+
+next_middleware.call(ctx)
+end
+)
+
+14). Scene Helpers
+
+-code(
+
+Check if user is in a scene
+
+if ctx.current_scene
+ctx.reply("You're in the #{ctx.current_scene.id} scene")
+else
+ctx.reply("You're not in a scene")
+end
+
+Force exit scene
+
+ctx.leave_scene
+
+Get all defined scenes
+
+scenes = bot.scenes
+
+{ :onboarding => #<Scene>, :quiz => #<Scene> }
+
+Check if scene exists
+
+if bot.scenes[:auth]
+ctx.enter_scene(:auth)
+else
+ctx.reply("Auth scene not available")
+end
+)
+
+📊 REAL-WORLD EXAMPLES
+
+15). E-commerce Checkout Scene
+
+-code(
+bot.scene(:checkout) do
+on_enter do |ctx|
+ctx.session[:cart] ||= []
+ctx.reply("🛒 Checkout Process")
+end
+
+step :select_shipping do |ctx|
+keyboard = ctx.keyboard do
+row "Standard (3-5 days)"
+row "Express (1-2 days)"
+row "Overnight"
+end
+ctx.reply("Select shipping:", reply_markup: keyboard)
+end
+
+step :enter_address do |ctx|
+ctx.session[:shipping] = ctx.message.text
+ctx.reply("Enter your shipping address:")
+end
+
+step :select_payment do |ctx|
+ctx.session[:address] = ctx.message.text
+keyboard = ctx.inline_keyboard do
+row { button "💳 Credit Card", callback_data: "cc" }
+row { button "📱 Mobile Money", callback_data: "momo" }
+row { button "💰 Cash on Delivery", callback_data: "cod" }
+end
+ctx.reply("Payment method:", reply_markup: keyboard)
+end
+
+step :process_payment do |ctx|
+ctx.session[:payment] = ctx.data
+
+```
+# Simulate payment processing
+ctx.reply("Processing payment...")
+sleep 2
+
+if ctx.session[:payment] == "cod"
+  ctx.reply("✅ Order confirmed! Pay on delivery.")
+else
+  ctx.reply("✅ Payment successful! Order confirmed.")
+end
+
+# Generate order summary
+total = calculate_total(ctx.session[:cart])
+ctx.reply("Order #: #{rand(100000..999999)}")
+ctx.reply("Total: $#{total}")
+ctx.reply("Shipping: #{ctx.session[:shipping]}")
+ctx.reply("Address: #{ctx.session[:address]}")
+
+ctx.leave_scene
+```
+
+end
+
+on_leave do |ctx|
+# Clear cart after checkout
+ctx.session.delete(:cart)
+ctx.reply("Thank you for your order! 📦")
+end
+end
+)
+
+16). Support Ticket Scene
+
+-code(
+bot.scene(:support) do
+step :describe_issue do |ctx|
+ctx.reply("Please describe your issue:")
+end
+
+step :select_category do |ctx|
+ctx.session[:issue] = ctx.message.text
+keyboard = ctx.keyboard do
+row "Bug Report", "Feature Request"
+row "Account Issue", "Billing"
+row "Other"
+end
+ctx.reply("Category:", reply_markup: keyboard)
+end
+
+step :priority do |ctx|
+ctx.session[:category] = ctx.message.text
+keyboard = ctx.inline_keyboard do
+row { button "🔴 High", callback_data: "high" }
+row { button "🟡 Medium", callback_data: "medium" }
+row { button "🟢 Low", callback_data: "low" }
+end
+ctx.reply("Priority:", reply_markup: keyboard)
+end
+
+step :confirm do |ctx|
+ctx.session[:priority] = ctx.data
+
+```
+# Create ticket in database (pseudo-code)
+ticket_id = create_ticket(
+  user_id: ctx.user_id,
+  issue: ctx.session[:issue],
+  category: ctx.session[:category],
+  priority: ctx.session[:priority]
+)
+
+ctx.reply("🎫 Ticket ##{ticket_id} created!")
+ctx.reply("We'll respond within 24 hours.")
+
+ctx.leave_scene
+```
+
+end
+end
+)
+
+-img(https://media.giphy.com/media/l41lUJ1YoYtMDe7I4/giphy.gif wid=600 alt="Support ticket flow")
+
+⚠️ COMMON PITFALLS
+
+17). What to Avoid
+
+-code(
+
+❌ DON'T: Forget to handle non-scene messages
+
+bot.on(:message) do |ctx|
+if ctx.current_scene
+# Scene will handle it
+else
+ctx.reply("I don't understand")
+end
+end
+
+❌ DON'T: Create infinite loops
+
+step :danger do |ctx|
+ctx.reply("Looping...")
+
+Don't call the same step without condition!
+
+ctx.current_scene.process_step(ctx, :danger)  # INFINITE LOOP!
+end
+
+✅ DO: Add exit conditions
+
+step :safe do |ctx|
+if ctx.session[:count].to_i < 5
+ctx.session[:count] = ctx.session[:count].to_i + 1
+ctx.reply("Count: #{ctx.session[:count]}")
+# Stay in same step
+else
+ctx.reply("Done!")
+ctx.leave_scene
+end
+end
+)
+
+🎯 BEST PRACTICES
+
+18). Scene Design Tips
+
+-note(1. Keep scenes focused - One scene = one complete workflow)
+-note(2. Use session for persistence - Data survives between steps)
+-note(3. Use state for temporaries - Data only for current step)
+-note(4. Always have exit path - Users can cancel anytime)
+-note(5. Validate inputs - Check data in each step)
+-note(6. Add timeouts - Prevent abandoned scenes)
+-note(7. Log scene activity - Debugging is easier)
+-note(8. Test with real users - Scenes are UX-heavy)
+
+19). Scene Lifecycle
+
+```
+┌─────────────────────┐
+│   ctx.enter_scene   │
+│        ↓            │
+│    on_enter hook    │
+│        ↓            │
+│   First step runs   │
+│        ↓            │
+│   User responds     │
+│        ↓            │
+│   Next step runs    │
+│        ↓            │
+│   (Repeat...)       │
+│        ↓            │
+│   ctx.leave_scene   │
+│        ↓            │
+│    on_leave hook    │
+└─────────────────────┘
+```
+
+🚀 NEXT LEVEL SCENES
+
+20). Dynamic Scene Generation
+
+-code(
+
+Create scenes on the fly
+
+def create_dynamic_scene(user_id, steps)
+scene_id = "dynamic_#{user_id}_#{Time.now.to_i}"
+
+bot.scene(scene_id.to_sym) do
+steps.each_with_index do |question, index|
+step "step_#{index}".to_sym do |ctx|
+ctx.reply(question)
+end
+end
+
+```
+step :finish do |ctx|
+  ctx.reply("Survey complete!")
+  ctx.leave_scene
+end
+```
+
+end
+
+scene_id
+end
+
+Usage
+
+survey_steps = [
+"How was our service?",
+"Rate from 1-10:",
+"Any comments?"
+]
+
+scene_id = create_dynamic_scene(ctx.user_id, survey_steps)
+ctx.enter_scene(scene_id.to_sym)
+)
+
+---
+
+-note(Scenes are Telegem's SUPER POWER - No other Ruby Telegram gem has this!)
+
+-warning(Test scenes thoroughly - they manage user state which can be complex)
+
+-link(Example bot with scenes https://gitlab.com/ruby-telegem/telegem-examples)
+-link(Scene API reference in code https://gitlab.com/ruby-telegem/telegem/blob/main/lib/core/scene.rb)
+
+That's EVERYTHING about Scenes! They transform your bot from simple Q&A to guided conversations! 🎬
