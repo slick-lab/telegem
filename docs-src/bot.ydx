@@ -1,0 +1,111 @@
+#Telegem bot api docs 
+
+1). bot.command(name, &block)
+     
+     purpose is to handle /commands 
+    -code(
+          bot.command("start") do |ctx|
+     ctx.reply("you started the bot")
+    end 
+     )
+
+2). bot.hears(name, filter, &block)
+      purpose: is to listen for natching text, patterns 
+   -code(
+         bot.hears("/hello/i") do |ctx|
+    ctx.reply("welcome ")
+     end 
+        )
+
+3).  bot.start_polling(**options)
+     use default telegem polling 
+     -code(
+           bot.start_polling
+       )
+    customized method
+    -code(
+         bot.start_polling(
+                           timeout: 10, limit:50)
+     )
+
+4). bot.running?
+    a simple way to ask telegem if your bot is running
+     -code(
+           if bot.running?
+             puts "bot is running"
+           )
+5). bot.shutdown
+      basically self explanatory
+
+    -code(
+          if bot.running?
+            puts "bot is running"
+          else 
+            bot.shutdown
+              puts "bot has been shut down"
+         )
+
+6). bot.on
+     purpose: Generic update handler
+  -code(
+bot.on(type, filters = {}, &block)
+bot.on(:message, text: /thanks/i) { |ctx| ctx.reply("You're welcome!") }
+bot.on(:callback_query) { |ctx| ctx.answer_callback_query }
+     )
+
+ 7). bot.use 
+     purpose: Add middleware
+   -code(
+bot.use(middleware, *args, &block)
+bot.use(MyMiddleware)
+bot.use { |ctx, next| puts "Before"; next.call(ctx); puts "After" }
+     )
+
+8). bot.error 
+    purpose: Error handler
+  -code(
+bot.error(&block)
+bot.error { |error, ctx| ctx.reply("Error: #{error.message}") }
+     )
+
+9). bot.scene
+    purpose: Scene definition
+   -code(
+bot.scene(id, &block)
+bot.scene(:auth) do
+  step :start { |ctx| ctx.reply("Enter username:") }
+  step :password { |ctx| ctx.session[:user] = ctx.message.text }
+end
+   )
+
+10). Webhook setup
+    -code(
+bot.webhook(app = nil, port: nil, host: '0.0.0.0', logger: nil, &block)
+bot.webhook(port: 3000)  # Creates webhook server
+      )
+
+13). Set webhook URL
+   -code(
+bot.set_webhook(url, **options)
+bot.set_webhook("https://example.com/webhook")
+     )
+
+14). Delete webhook
+  -code(
+bot.delete_webhook
+      )
+
+15). Get webhook info
+  -code(
+bot.get_webhook_info
+       )
+
+
+
+16). Manual update processing
+   _code(
+bot.process(update_data)
+# For testing or webhooks
+update = { "update_id" => 1, "message" => { "text" => "hi" } }
+bot.process(update)
+  )
