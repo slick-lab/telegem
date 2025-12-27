@@ -1,0 +1,598 @@
+📦 TYPES SYSTEM - Complete Reference
+
+🎯 WHAT ARE TYPES?
+
+1). Types = Telegram Objects as Ruby Classes
+
+Telegem wraps raw Telegram API JSON into beautiful Ruby objects with methods, not just hash access.
+
+-code(
+
+❌ WITHOUT TYPES (raw API):
+
+update["message"]["from"]["first_name"]
+update["message"]["chat"]["id"]
+
+✅ WITH TYPES (Telegem):
+
+ctx.from.first_name
+ctx.chat.id
+ctx.message.command?
+)
+
+-note(Types auto-convert JSON hashes → Ruby objects with methods)
+
+👤 USER TYPE
+
+2). Basic User Properties
+
+-code(
+user = ctx.from  # Returns User object
+
+Core properties
+
+user.id           # => 123456789 (Integer)
+user.first_name   # => "John" (String)
+user.last_name    # => "Doe" (String or nil)
+user.username     # => "@johndoe" (String or nil)
+user.is_bot       # => false (Boolean)
+user.language_code # => "en" (String or nil)
+)
+
+3). User Helper Methods
+
+-code(
+
+Get full name
+
+user.full_name    # => "John Doe" (combines first + last)
+
+Get mention for replies
+
+user.mention      # => "@johndoe" or "John" (fallback)
+
+Check bot status
+
+user.bot?         # => true/false (alias for is_bot)
+user.human?       # => true/false (opposite of bot?)
+
+Premium features
+
+user.is_premium   # => true/false (Telegram Premium)
+user.added_to_attachment_menu # => true/false
+)
+
+4). Complete User Example
+
+-code(
+
+In a handler:
+
+bot.on(:message) do |ctx|
+user = ctx.from
+
+ctx.reply("👋 Hello #{user.full_name}!")
+
+if user.username
+ctx.reply("Your username: #{user.username}")
+end
+
+if user.is_premium
+ctx.reply("🌟 Thanks for being a Premium user!")
+end
+
+if user.bot?
+ctx.reply("🤖 I see you're a bot too!")
+end
+end
+)
+
+💬 CHAT TYPE
+
+5). Chat Properties
+
+-code(
+chat = ctx.chat  # Returns Chat object
+
+Identification
+
+chat.id           # => -1001234567890 (Integer)
+chat.type         # => "private", "group", "supergroup", "channel"
+chat.username     # => "@groupname" (for public groups/channels)
+chat.title        # => "My Awesome Group" (String)
+
+Chat metadata
+
+chat.description  # => "Group description..." (String or nil)
+chat.invite_link  # => "https://t.me/join/..." (String or nil)
+chat.bio          # => "Bio for private chats" (String or nil)
+)
+
+6). Chat Type Checkers
+
+-code(
+
+Type predicates
+
+chat.private?     # => true/false
+chat.group?       # => true/false
+chat.supergroup?  # => true/false
+chat.channel?     # => true/false
+
+Feature checkers
+
+chat.has_private_forwards?  # => true/false
+chat.has_protected_content? # => true/false
+chat.has_restricted_voice_and_video_messages? # => true/false
+
+Settings
+
+chat.slow_mode_delay        # => 10 (seconds, or 0)
+chat.message_auto_delete_time # => 3600 (seconds, or nil)
+)
+
+7). Chat Helper Methods
+
+-code(
+
+Get display name
+
+chat.display_name  # => title OR username OR "Chat ##{id}"
+
+Check permissions
+
+if chat.private?
+ctx.reply("This is a private chat 🤫")
+elsif chat.supergroup?
+ctx.reply("This is a supergroup with #{chat.members_count} members")
+end
+
+Linked chat (for channels)
+
+if chat.linked_chat_id
+ctx.reply("Linked to chat: #{chat.linked_chat_id}")
+end
+)
+
+📨 MESSAGE TYPE
+
+8). Message Identification
+
+-code(
+msg = ctx.message  # Returns Message object
+
+Basic identifiers
+
+msg.message_id     # => 123 (Integer, unique in chat)
+msg.date           # => 2023-12-27 10:30:00 +0000 (Time object)
+msg.edit_date      # => 2023-12-27 10:31:00 +0000 (Time or nil)
+
+Content
+
+msg.text           # => "Hello world!" (String or nil)
+msg.caption        # => "Photo description" (String or nil)
+msg.entities       # => [MessageEntity, ...] (Array or nil)
+msg.caption_entities # => [MessageEntity, ...] (Array or nil)
+)
+
+9). Message Media Detection
+
+-code(
+
+Media checkers
+
+msg.has_media?     # => true/false (any media)
+msg.media_type     # => :photo, :video, :document, :audio, :voice, :sticker, nil
+
+Media accessors
+
+msg.photo          # => [PhotoSize, ...] (Array or nil)
+msg.video          # => Video object or nil
+msg.document       # => Document object or nil
+msg.audio          # => Audio object or nil
+msg.voice          # => Voice object or nil
+msg.video_note     # => VideoNote object or nil
+msg.sticker        # => Sticker object or nil
+msg.contact        # => Contact object or nil
+msg.location       # => Location object or nil
+msg.venue          # => Venue object or nil
+msg.poll           # => Poll object or nil
+)
+
+10). Command Handling
+
+-code(
+
+Command detection
+
+msg.command?       # => true/false (is a /command)
+msg.command_name   # => "start" (without slash)
+msg.command_args   # => "search query" (arguments after command)
+
+Example usage:
+
+if msg.command?
+case msg.command_name
+when "start"
+ctx.reply("Welcome!")
+when "search"
+query = msg.command_args
+ctx.reply("Searching: #{query}")
+end
+end
+)
+
+11). Message Relationships
+
+-code(
+
+Reply chain
+
+msg.reply?         # => true/false (is reply to another message)
+msg.reply_to_message # => Message object or nil
+
+Forward info
+
+msg.forward?       # => true/false (is forwarded)
+msg.forward_from   # => User object or nil
+msg.forward_from_chat # => Chat object or nil
+msg.forward_from_message_id # => Integer or nil
+msg.forward_date   # => Time object or nil
+msg.forward_sender_name # => String or nil
+msg.forward_signature # => String or nil
+
+Pinned messages
+
+msg.pinned_message # => Message object or nil (the pinned message)
+)
+
+12). Chat Events
+
+-code(
+
+Chat modifications
+
+msg.new_chat_members   # => [User, ...] or nil
+msg.left_chat_member   # => User object or nil
+msg.new_chat_title     # => String or nil
+msg.new_chat_photo     # => [PhotoSize, ...] or nil
+msg.delete_chat_photo? # => true/false
+msg.group_chat_created? # => true/false
+msg.supergroup_chat_created? # => true/false
+msg.channel_chat_created? # => true/false
+msg.migrate_to_chat_id # => Integer or nil
+msg.migrate_from_chat_id # => Integer or nil
+)
+
+🔄 UPDATE TYPE
+
+13). Update Object
+
+-code(
+update = ctx.update  # Returns Update object
+
+Update identification
+
+update.update_id    # => 123456789 (Integer, sequential)
+update.type         # => :message, :callback_query, :inline_query, etc
+
+Access specific update type
+
+update.message      # => Message or nil
+update.callback_query # => CallbackQuery or nil
+update.inline_query # => InlineQuery or nil
+update.channel_post # => Message or nil
+update.edited_message # => Message or nil
+update.edited_channel_post # => Message or nil
+
+Get the user who triggered update
+
+update.from         # => User object (from any update type)
+)
+
+14). Update Type Detection
+
+-code(
+
+Check update type
+
+case ctx.update.type
+when :message
+ctx.reply("Got a message: #{ctx.message.text}")
+when :callback_query
+ctx.reply("Button clicked: #{ctx.data}")
+when :inline_query
+ctx.reply("Inline query: #{ctx.query}")
+when :chat_member
+ctx.reply("Chat member updated")
+end
+
+Specific checkers
+
+if ctx.update.message?
+
+Handle message
+
+elsif ctx.update.callback_query?
+
+Handle button click
+
+end
+)
+
+🔘 CALLBACK QUERY TYPE
+
+15). Callback Query Properties
+
+-code(
+cb = ctx.callback_query  # Returns CallbackQuery object
+
+Identification
+
+cb.id             # => "123456789:abcdef" (String)
+cb.from           # => User object (who clicked)
+cb.message        # => Message object (containing button) or nil
+cb.inline_message_id # => String or nil (for inline messages)
+cb.chat_instance  # => "123456789" (String)
+cb.data           # => "button_clicked" (String or nil)
+cb.game_short_name # => String or nil
+)
+
+16). Callback Query Helpers
+
+-code(
+
+Quick checks
+
+cb.from_user?     # => true/false (has from user)
+cb.message?       # => true/false (has message)
+cb.inline_message? # => true/false (inline message)
+cb.has_data?      # => true/false (has data)
+
+Example usage:
+
+bot.on(:callback_query) do |ctx|
+cb = ctx.callback_query
+
+ctx.answer_callback_query(text: "Clicked by #{cb.from.first_name}")
+
+if cb.data == "delete"
+cb.message.delete if cb.message?
+end
+end
+)
+
+🔍 INLINE QUERY TYPE
+
+17). Inline Query Properties
+
+-code(
+iq = ctx.inline_query  # Returns InlineQuery object
+
+Core properties
+
+iq.id             # => "123456789" (String)
+iq.from           # => User object
+iq.query          # => "search term" (String)
+iq.offset         # => "0" (String)
+iq.chat_type      # => "sender", "private", "group", etc or nil
+iq.location       # => Location object or nil
+)
+
+📊 MESSAGE ENTITY TYPE
+
+18). MessageEntity Object
+
+-code(
+
+Access entities from message
+
+msg.entities.each do |entity|
+
+Entity properties
+
+entity.type      # => "mention", "hashtag", "bot_command", "url", etc
+entity.offset    # => 0 (Integer, start position)
+entity.length    # => 5 (Integer, length in characters)
+entity.url       # => String or nil (for "text_link" type)
+entity.user      # => User object or nil (for "text_mention" type)
+entity.language  # => String or nil (for "pre" type)
+
+Extract text from message
+
+text = msg.text[entity.offset, entity.length]
+ctx.reply("Found #{entity.type}: #{text}")
+end
+)
+
+🖼️ MEDIA TYPES
+
+19). PhotoSize Type
+
+-code(
+
+Photos come as array of PhotoSize objects
+
+msg.photo.each do |photo|
+photo.file_id       # => "AgACAgQAAxkDAAIB..." (String)
+photo.file_unique_id # => "AQADBAADYQADK..." (String)
+photo.width        # => 1280 (Integer)
+photo.height       # => 720 (Integer)
+photo.file_size    # => 123456 (Integer or nil)
+
+Get best quality photo (last in array is largest)
+
+best_photo = msg.photo.last
+end
+)
+
+20). Document Type
+
+-code(
+doc = msg.document
+
+doc.file_id        # => "BQACAgQAAxkDAAIB..." (String)
+doc.file_unique_id # => "AQADBAADdwADK..." (String)
+doc.file_name      # => "document.pdf" (String or nil)
+doc.mime_type      # => "application/pdf" (String or nil)
+doc.file_size      # => 1024000 (Integer or nil)
+
+Thumbnail (if available)
+
+if doc.thumbnail
+thumbnail = doc.thumbnail  # PhotoSize object
+end
+)
+
+21). Audio/Video/Voice Types
+
+-code(
+
+Audio specific
+
+audio = msg.audio
+audio.duration     # => 180 (seconds, Integer)
+audio.performer    # => "Artist Name" (String or nil)
+audio.title        # => "Song Title" (String or nil)
+
+Video specific
+
+video = msg.video
+video.duration     # => 60 (seconds, Integer)
+video.width        # => 1920 (Integer)
+video.height       # => 1080 (Integer)
+video.supports_streaming? # => true/false
+
+Voice specific
+
+voice = msg.voice
+voice.duration     # => 30 (seconds, Integer)
+)
+
+🔧 TYPE CONVERSION
+
+22). Raw Data Access
+
+-code(
+
+Get raw Telegram JSON
+
+user._raw_data     # => {"id"=>123, "first_name"=>"John", ...}
+msg._raw_data      # => Complete message JSON
+ctx.raw_update     # => Complete update JSON
+
+Convert back to hash
+
+user.to_h          # => Hash representation
+msg.to_hash        # => Alias for to_h
+
+Debug output
+
+puts user.inspect  # => #Telegem::Types::User:0x00007f8e4a1b2c80
+puts user.to_s     # => Same as inspect
+)
+
+23). Dynamic Property Access
+
+-code(
+
+Types support method_missing for any Telegram field
+
+user.some_custom_field  # Works even if not predefined!
+
+Check if field exists
+
+user.respond_to?(:custom_field)  # => true/false
+
+Safe access
+
+if user.respond_to?(:language_code)
+lang = user.language_code
+end
+)
+
+🎯 PRACTICAL EXAMPLES
+
+24). User Profile Command
+
+-code(
+bot.command('profile') do |ctx|
+user = ctx.from
+chat = ctx.chat
+
+profile = []
+profile << "👤 Profile"
+profile << "Name: #{user.full_name}"
+profile << "ID: #{user.id}"
+profile << "Username: #{user.username}" if user.username
+profile << "Language: #{user.language_code}" if user.language_code
+profile << "Premium: #{user.is_premium ? 'Yes 🌟' : 'No'}"
+profile << "Chat: #{chat.display_name}"
+profile << "Chat Type: #{chat.type}"
+
+ctx.reply(profile.join("\n"), parse_mode: 'Markdown')
+end
+)
+
+25). Media Handler
+
+-code(
+bot.on(:message) do |ctx|
+msg = ctx.message
+
+if msg.has_media?
+case msg.media_type
+when :photo
+ctx.reply("📸 Nice photo! (#{msg.photo.size} sizes available)")
+ctx.reply("Largest: #{msg.photo.last.width}x#{msg.photo.last.height}")
+when :video
+ctx.reply("🎥 Video: #{msg.video.duration}s, #{msg.video.width}x#{msg.video.height}")
+when :document
+ctx.reply("📄 Document: #{msg.document.file_name || 'Unnamed'}")
+ctx.reply("Type: #{msg.document.mime_type}") if msg.document.mime_type
+end
+end
+end
+)
+
+26). Forward Tracker
+
+-code(
+bot.on(:message) do |ctx|
+msg = ctx.message
+
+if msg.forward?
+info = ["📤 This was forwarded!"]
+
+```
+if msg.forward_from
+  info << "From user: #{msg.forward_from.full_name}"
+  info << "User ID: #{msg.forward_from.id}"
+end
+
+if msg.forward_from_chat
+  info << "From chat: #{msg.forward_from_chat.display_name}"
+  info << "Chat ID: #{msg.forward_from_chat.id}"
+end
+
+if msg.forward_date
+  info << "Forwarded: #{msg.forward_date.strftime('%Y-%m-%d %H:%M')}"
+end
+
+ctx.reply(info.join("\n"))
+```
+
+end
+end
+)
+
+---
+
+-note(Types make Telegram API pleasant to use - No more hash digging!)
+
+-warning(Some fields are nil when not applicable - always check with if)
+
+-link(Telegram Bot API Types https://core.telegram.org/bots/api#available-types)
+-link(Telegem Types Source https://gitlab.com/yourname/telegem/blob/main/lib/types.rb)
+
+That's EVERY TYPE in Telegem! Objects with brains, not just dumb data! 🧠
