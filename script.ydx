@@ -1,0 +1,1670 @@
+#!/bin/bash
+# YDX to HTML Converter with SUPER COOL CSS
+# Fixed all errors - ready for GitLab Pages
+
+DOCS_SRC="${1:-docs-src}"
+DOCS_OUT="${2:-public}"
+
+echo "🚀 Starting GitLab Docs Generator with SUPER COOL CSS..."
+echo "✨ This will create the most beautiful documentation you've ever seen!"
+
+# Create output directory
+mkdir -p "$DOCS_OUT"
+
+# Generate SUPER COOL CSS file
+cat > "$DOCS_OUT/style.css" << 'CSS_EOF'
+/* ==========================================================================
+   GITLAB DOCS GENERATOR - SUPER COOL CSS
+   The most beautiful documentation theme ever created
+   ========================================================================== */
+
+:root {
+  /* ===== CORE COLOR PALETTE ===== */
+  --primary: #6366f1;      /* Indigo - calm, trustworthy */
+  --primary-dark: #4f46e5;
+  --primary-light: #818cf8;
+  --secondary: #ec4899;    /* Pink - energetic, attention */
+  --accent: #06b6d4;       /* Cyan - fresh, modern */
+  --success: #10b981;      /* Emerald */
+  --warning: #f59e0b;      /* Amber */
+  --danger: #ef4444;       /* Red */
+  
+  /* ===== NEUTRAL TONES ===== */
+  --text-primary: #1e293b;     /* Slate 800 */
+  --text-secondary: #475569;   /* Slate 600 */
+  --text-tertiary: #64748b;    /* Slate 500 */
+  --text-light: #f8fafc;       /* Slate 50 */
+  
+  /* ===== BACKGROUNDS ===== */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f1f5f9;     /* Slate 100 */
+  --bg-tertiary: #e2e8f0;      /* Slate 200 */
+  --bg-code: #0f172a;          /* Slate 900 */
+  --bg-card: #ffffff;
+  --bg-sidebar: rgba(255, 255, 255, 0.95);
+  --bg-header: rgba(255, 255, 255, 0.98);
+  
+  /* ===== BORDERS & SHADOWS ===== */
+  --border-light: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --border-dark: #94a3b8;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  
+  /* ===== TYPOGRAPHY ===== */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Monaco, 'Cascadia Mono', 'Roboto Mono', monospace;
+  
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+  
+  /* ===== ANIMATIONS ===== */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* ===== GRADIENTS ===== */
+  --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+  --gradient-dark: linear-gradient(135deg, var(--bg-code) 0%, #1e293b 100%);
+}
+
+/* ==========================================================================
+   BASE STYLES
+   ========================================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-sans);
+  line-height: 1.7;
+  color: var(--text-primary);
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
+    linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ==========================================================================
+   CONTAINER & LAYOUT
+   ========================================================================== */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ==========================================================================
+   HEADER - FLOATING GLASS MORPHISM
+   ========================================================================== */
+
+.docs-header {
+  background: var(--bg-header);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    var(--shadow-lg),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  position: relative;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  background: var(--gradient-primary);
+  color: white;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--transition-fast);
+}
+
+.logo::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.logo:hover::before {
+  left: 100%;
+}
+
+.logo:hover {
+  transform: translateY(-2px);
+}
+
+.logo-icon {
+  font-size: 1.5rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-links a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-primary);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  border-radius: var(--radius-full);
+  z-index: -1;
+}
+
+.nav-links a:hover {
+  color: white;
+  transform: translateY(-2px);
+}
+
+.nav-links a:hover::before {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   MAIN CONTENT AREA
+   ========================================================================== */
+
+.main-content {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 3rem;
+  padding: 3rem 0;
+  min-height: calc(100vh - 80px);
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   SIDEBAR - FLOATING GLASS
+   ========================================================================== */
+
+.sidebar {
+  position: sticky;
+  top: 6rem;
+  align-self: start;
+  background: var(--bg-sidebar);
+  border-radius: var(--radius-2xl);
+  padding: 2rem;
+  box-shadow: var(--shadow-xl);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.sidebar h3 {
+  color: var(--primary);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--border-light);
+  position: relative;
+}
+
+.sidebar h3::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+}
+
+.toc-list {
+  list-style: none;
+}
+
+.toc-list li {
+  margin-bottom: 0.375rem;
+  position: relative;
+}
+
+.toc-list a {
+  display: block;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 0.625rem 1rem;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-fast);
+  border-left: 3px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.toc-list a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-primary);
+  opacity: 0.1;
+  transition: left 0.3s ease;
+}
+
+.toc-list a:hover {
+  color: var(--primary);
+  background: var(--bg-secondary);
+  border-left-color: var(--primary);
+  transform: translateX(4px);
+}
+
+.toc-list a:hover::before {
+  left: 0;
+}
+
+.toc-list a.active {
+  color: var(--primary);
+  background: var(--bg-secondary);
+  border-left-color: var(--primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ==========================================================================
+   CONTENT AREA - FLOATING CARD
+   ========================================================================== */
+
+.content {
+  background: var(--bg-card);
+  border-radius: var(--radius-2xl);
+  padding: 3rem;
+  box-shadow: var(--shadow-2xl);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transform-style: preserve-3d;
+  position: relative;
+  overflow: hidden;
+}
+
+.content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+}
+
+/* ==========================================================================
+   TYPOGRAPHY - SUPER COOL
+   ========================================================================== */
+
+h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 2rem;
+  line-height: 1.2;
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+
+h1::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100px;
+  height: 4px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+}
+
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin: 3rem 0 1.5rem;
+  padding: 0.5rem 0 0.5rem 1.5rem;
+  position: relative;
+}
+
+h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  width: 4px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 2.5rem 0 1rem;
+  padding-left: 1rem;
+  position: relative;
+}
+
+h3::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+p {
+  margin-bottom: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 1.125rem;
+  line-height: 1.8;
+}
+
+/* ==========================================================================
+   CODE BLOCKS - ULTRA MODERN
+   ========================================================================== */
+
+pre {
+  background: var(--bg-code);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  margin: 2.5rem 0;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    var(--shadow-xl),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+pre::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+pre::after {
+  content: 'Code';
+  position: absolute;
+  top: -12px;
+  left: 2rem;
+  background: var(--gradient-primary);
+  color: white;
+  padding: 0.25rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #e2e8f0;
+}
+
+.code-inline {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  color: var(--primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875em;
+  border: 1px solid var(--border-light);
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ==========================================================================
+   SPECIAL ELEMENTS
+   ========================================================================== */
+
+/* Alerts & Notes */
+.alert {
+  padding: 1.5rem;
+  border-radius: var(--radius-xl);
+  margin: 2rem 0;
+  border-left: 4px solid;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.alert::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+  background: inherit;
+  border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+}
+
+.alert.note {
+  border-left-color: var(--success);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+}
+
+.alert.warning {
+  border-left-color: var(--warning);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(245, 158, 11, 0.02) 100%);
+}
+
+.alert.danger {
+  border-left-color: var(--danger);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(239, 68, 68, 0.02) 100%);
+}
+
+.alert-icon {
+  font-size: 1.5rem;
+  margin-right: 0.75rem;
+  vertical-align: middle;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Links */
+a:not(.nav-links a):not(.toc-list a) {
+  color: var(--primary);
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-fast);
+  font-weight: 500;
+  position: relative;
+}
+
+a:not(.nav-links a):not(.toc-list a)::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--gradient-primary);
+  transition: width var(--transition-fast);
+  border-radius: var(--radius-full);
+}
+
+a:not(.nav-links a):not(.toc-list a):hover {
+  color: var(--primary-dark);
+}
+
+a:not(.nav-links a):not(.toc-list a):hover::after {
+  width: 100%;
+}
+
+/* Lists */
+ul, ol {
+  margin: 1.5rem 0 1.5rem 2rem;
+  color: var(--text-secondary);
+}
+
+li {
+  margin-bottom: 0.75rem;
+  line-height: 1.7;
+  position: relative;
+  padding-left: 0.5rem;
+}
+
+ul li::before {
+  content: '•';
+  color: var(--primary);
+  font-weight: bold;
+  position: absolute;
+  left: -1rem;
+}
+
+ol {
+  counter-reset: list-counter;
+}
+
+ol li {
+  counter-increment: list-counter;
+}
+
+ol li::before {
+  content: counter(list-counter) '.';
+  color: var(--primary);
+  font-weight: 600;
+  position: absolute;
+  left: -2rem;
+  width: 1.5rem;
+  text-align: right;
+}
+
+/* Cards */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin: 2.5rem 0;
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-2xl);
+  border-color: var(--primary-light);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card h3 {
+  margin-top: 0;
+  color: var(--primary);
+  font-size: 1.25rem;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 2.5rem 0;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  background: var(--bg-card);
+}
+
+th {
+  background: var(--gradient-primary);
+  color: white;
+  font-weight: 600;
+  padding: 1.25rem;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+th::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+td {
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-card);
+  transition: background-color var(--transition-fast);
+}
+
+tr:hover td {
+  background: var(--bg-secondary);
+}
+
+/* ==========================================================================
+   FOOTER - GRADIENT GLOW
+   ========================================================================== */
+
+.docs-footer {
+  background: var(--gradient-dark);
+  color: var(--text-light);
+  padding: 4rem 0;
+  margin-top: 6rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.docs-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.footer-content p {
+  color: var(--text-light);
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .main-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .sidebar {
+    position: static;
+    order: 2;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+  }
+  
+  h2 {
+    font-size: 1.75rem;
+  }
+  
+  .card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .content {
+    padding: 2rem;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .content {
+    padding: 1.5rem;
+  }
+  
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   ANIMATIONS & EFFECTS
+   ========================================================================== */
+
+.content > * {
+  animation: slideUp 0.5s ease forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content > *:nth-child(1) { animation-delay: 0.1s; }
+.content > *:nth-child(2) { animation-delay: 0.2s; }
+.content > *:nth-child(3) { animation-delay: 0.3s; }
+.content > *:nth-child(4) { animation-delay: 0.4s; }
+.content > *:nth-child(5) { animation-delay: 0.5s; }
+.content > *:nth-child(n+6) { animation-delay: 0.6s; }
+
+/* ==========================================================================
+   DARK MODE - AUTOMATIC
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --bg-card: #1e293b;
+    --bg-sidebar: rgba(30, 41, 59, 0.95);
+    --bg-header: rgba(30, 41, 59, 0.98);
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --border-light: #334155;
+    --border-medium: #475569;
+  }
+  
+  body {
+    background: 
+      radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+      linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  }
+  
+  .content,
+  .sidebar {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  pre {
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  .card {
+    border-color: var(--border-medium);
+  }
+}
+
+/* ==========================================================================
+   PRINT STYLES
+   ========================================================================== */
+
+@media print {
+  .docs-header,
+  .sidebar,
+  .docs-footer {
+    display: none;
+  }
+  
+  .main-content {
+    display: block;
+    padding: 0;
+  }
+  
+  .content {
+    box-shadow: none;
+    border: none;
+    padding: 0;
+  }
+  
+  pre {
+    background: #f5f5f5 !important;
+    color: #333 !important;
+    border: 1px solid #ddd;
+  }
+  
+  a {
+    color: #000 !important;
+    text-decoration: underline !important;
+  }
+}
+CSS_EOF
+
+echo "✅ Generated SUPER COOL CSS with:"
+echo "   • Glass morphism effects"
+echo "   • Gradient animations"
+echo "   • Smooth transitions"
+echo "   • Dark/light mode auto"
+echo "   • Mobile responsive"
+echo "   • Print styles"
+
+# ============================================================================
+# FUNCTION: Convert .ydx to HTML with SUPER COOL styling
+# ============================================================================
+
+convert_ydx_to_html() {
+  local input_file="$1"
+  local output_file="$2"
+  
+  # Get filename for title
+  local title=$(basename "${input_file%.ydx}")
+  title="${title//-/ }"
+  title="${title^}"
+  
+  # Start HTML with SUPER COOL template
+  cat > "$output_file" << HTML_EOF
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title} - GitLab Docs</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+    <meta name="description" content="Beautiful documentation generated from .ydx files">
+    <meta name="theme-color" content="#6366f1">
+</head>
+<body>
+    <header class="docs-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">✨</span>
+                    <span>GitLab Docs</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#getting-started">Getting Started</a></li>
+                    <li><a href="#api">API Reference</a></li>
+                    <li><a href="#examples">Examples</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="main-content">
+            <aside class="sidebar">
+                <h3>Table of Contents</h3>
+                <ul class="toc-list">
+HTML_EOF
+  
+  # Generate TOC - FIXED VERSION
+  awk '
+  BEGIN { count = 0; }
+  /^# / {
+    title = substr($0, 3);
+    # Create slug: convert to lowercase, replace non-alphanumeric with hyphens
+    slug = tolower(title);
+    gsub(/[^a-z0-9]+/, "-", slug);
+    # Remove trailing hyphens
+    sub(/-$/, "", slug);
+    print "<li><a href=\"#" slug "\">" title "</a></li>";
+    next;
+  }
+  /^[0-9]+\)\./ {
+    title = $0;
+    gsub(/^[0-9]+\)\. /, "", title);
+    # Create slug for numbered sections
+    slug = tolower(title);
+    gsub(/[^a-z0-9]+/, "-", slug);
+    sub(/-$/, "", slug);
+    print "<li><a href=\"#" slug "\">" title "</a></li>";
+  }
+  ' "$input_file" >> "$output_file"
+  
+  # Continue HTML
+  cat >> "$output_file" << HTML_EOF
+                </ul>
+                <div style="margin-top: 2rem;">
+                    <div class="card" style="margin: 0;">
+                        <h3>Quick Info</h3>
+                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">Generated from .ydx files</p>
+                        <p style="font-size: 0.875rem; margin-bottom: 0;">$(date "+%B %d, %Y")</p>
+                    </div>
+                </div>
+            </aside>
+
+            <article class="content">
+HTML_EOF
+  
+  # Process .ydx content with SUPER COOL styling - FIXED VERSION
+  awk '
+  BEGIN {
+    in_code = 0;
+    section_count = 0;
+    code_block_count = 0;
+  }
+  
+  /^# / {
+    title = substr($0, 3);
+    slug = tolower(title);
+    gsub(/[^a-z0-9]+/, "-", slug);
+    sub(/-$/, "", slug);
+    print "<h1 id=\"" slug "\"><span class=\"gradient-text\">" title "</span></h1>";
+    next;
+  }
+  
+  /^[0-9]+\)\./ {
+    section_count++;
+    title = $0;
+    # Remove the number prefix
+    gsub(/^[0-9]+\)\. /, "", title);
+    # Create slug
+    slug = tolower(title);
+    gsub(/[^a-z0-9]+/, "-", slug);
+    sub(/-$/, "", slug);
+    print "<h2 id=\"" slug "\">" title "</h2>";
+    next;
+  }
+  
+  /-code\(/ {
+    in_code = 1;
+    code_block_count++;
+    print "<pre><code>";
+    # Remove the -code( prefix from the first line
+    sub(/-code\(/, "", $0);
+    if ($0 != "") print $0;
+    next;
+  }
+  
+  in_code && /^\)$/ {
+    in_code = 0;
+    print "</code></pre>";
+    next;
+  }
+  
+  in_code {
+    print $0;
+    next;
+  }
+  
+  /-img\(/ {
+    match($0, /-img\((.*)\)/, arr);
+    if (arr[1] != "") {
+      split(arr[1], parts, " ");
+      url = parts[1];
+      width = "100%";
+      alt = "Documentation image";
+      caption = "";
+      
+      for (i = 1; i <= length(parts); i++) {
+        if (parts[i] ~ /^wid=/) width = substr(parts[i], 5);
+        if (parts[i] ~ /^alt=/) alt = substr(parts[i], 5);
+        if (parts[i] ~ /^caption=/) caption = substr(parts[i], 9);
+      }
+      
+      printf "<figure style=\"text-align: center; margin: 2.5rem 0;\">\n";
+      printf "  <img src=\"%s\" style=\"width: %s; max-width: 100%%; border-radius: var(--radius-xl);\" alt=\"%s\">\n", url, width, alt;
+      if (caption != "") printf "  <figcaption style=\"margin-top: 0.75rem; color: var(--text-tertiary); font-size: 0.875rem;\">%s</figcaption>\n", caption;
+      printf "</figure>\n";
+    }
+    next;
+  }
+  
+  /-gif\(/ {
+    match($0, /-gif\((.*)\)/, arr);
+    if (arr[1] != "") {
+      split(arr[1], parts, " ");
+      url = parts[1];
+      width = "100%";
+      
+      for (i = 1; i <= length(parts); i++) {
+        if (parts[i] ~ /^wid=/) width = substr(parts[i], 5);
+      }
+      
+      printf "<div class=\"video-container\">\n";
+      printf "  <video autoplay loop muted playsinline style=\"width: %s;\">\n", width;
+      printf "    <source src=\"%s\" type=\"video/mp4\">\n", url;
+      printf "    Your browser does not support video.\n";
+      printf "  </video>\n";
+      printf "</div>\n";
+    }
+    next;
+  }
+  
+  /-note\(/ {
+    match($0, /-note\((.*)\)/, arr);
+    if (arr[1] != "") {
+      print "<div class=\"alert note\">";
+      print "  <span class=\"alert-icon\">💡</span>";
+      print "  " arr[1];
+      print "</div>";
+    }
+    next;
+  }
+  
+  /-warning\(/ {
+    match($0, /-warning\((.*)\)/, arr);
+    if (arr[1] != "") {
+      print "<div class=\"alert warning\">";
+      print "  <span class=\"alert-icon\">⚠️</span>";
+      print "  " arr[1];
+      print "</div>";
+    }
+    next;
+  }
+  
+  /-link\(/ {
+    match($0, /-link\((.*)\)/, arr);
+    if (arr[1] != "") {
+      split(arr[1], parts, " ");
+      if (length(parts) >= 2) {
+        text = parts[1];
+        url = parts[2];
+        print "<a href=\"" url "\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"display: inline-flex; align-items: center; gap: 0.5rem;\">🔗 " text "</a>";
+      }
+    }
+    next;
+  }
+  
+  /^$/ {
+    print "";
+    next;
+  }
+  
+  /`[^`]+`/ {
+    # Handle inline code
+    gsub(/`([^`]+)`/, "<code class=\"code-inline\">\\1</code>");
+    print "<p>" $0 "</p>";
+    next;
+  }
+  
+  {
+    print "<p>" $0 "</p>";
+  }
+  ' "$input_file" >> "$output_file"
+  
+  # Close HTML
+  cat >> "$output_file" << HTML_EOF
+            </article>
+        </div>
+    </main>
+
+    <footer class="docs-footer">
+        <div class="footer-content">
+            <div>
+                <p>✨ Generated with GitLab Docs Generator</p>
+                <p>Super Cool CSS Theme v2.0</p>
+            </div>
+            <div>
+                <p>📅 $(date "+%B %d, %Y • %H:%M")</p>
+                <p>🎨 Glass Morphism • Gradients • Animations</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 100,
+                    behavior: 'smooth'
+                });
+                
+                // Update active state in TOC
+                document.querySelectorAll('.toc-list a').forEach(link => {
+                    link.classList.remove('active');
+                });
+                this.classList.add('active');
+            }
+        });
+    });
+    
+    // Add active class to current section in TOC
+    const observerOptions = {
+        root: null,
+        rootMargin: '-100px 0px -66%',
+        threshold: 0
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const id = entry.target.getAttribute('id');
+            if (entry.isIntersecting) {
+                document.querySelectorAll('.toc-list a').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + id) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    }, observerOptions);
+    
+    // Observe all headings
+    document.querySelectorAll('h1, h2').forEach(heading => {
+        observer.observe(heading);
+    });
+    
+    // Add copy button to code blocks
+    document.querySelectorAll('pre').forEach(pre => {
+        const button = document.createElement('button');
+        button.innerHTML = '📋';
+        button.style.cssText = 'position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;padding:0.25rem 0.5rem;border-radius:var(--radius-sm);cursor:pointer;font-size:0.875rem;transition:all 0.2s ease;';
+        button.addEventListener('mouseenter', () => {
+            button.style.background = 'rgba(255,255,255,0.2)';
+        });
+        button.addEventListener('mouseleave', () => {
+            button.style.background = 'rgba(255,255,255,0.1)';
+        });
+        button.addEventListener('click', () => {
+            const code = pre.querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+        pre.style.position = 'relative';
+        pre.appendChild(button);
+    });
+    </script>
+</body>
+</html>
+HTML_EOF
+  
+  echo "✨ Generated SUPER COOL page: $output_file"
+}
+
+# ============================================================================
+# MAIN SCRIPT EXECUTION
+# ============================================================================
+
+# Check if source directory exists
+if [ ! -d "$DOCS_SRC" ]; then
+  echo "📁 Creating $DOCS_SRC directory..."
+  mkdir -p "$DOCS_SRC"
+  echo "📝 Created empty docs-src directory"
+fi
+
+# Count .ydx files (excluding script.ydx)
+ydx_files=$(find "$DOCS_SRC" -name "*.ydx" ! -name "script.ydx" 2>/dev/null | wc -l)
+echo "📄 Found $ydx_files .ydx files"
+
+# Create sample if no .ydx files found
+if [ "$ydx_files" -eq 0 ]; then
+  echo "🎨 Creating SUPER COOL sample documentation..."
+  
+  cat > "$DOCS_SRC/getting-started.ydx" << 'SAMPLE_EOF'
+# Getting Started with YDX
+
+Welcome to the **most beautiful documentation generator** for GitLab! Write simple .ydx files and get professional, animated docs.
+
+## Why YDX Rocks
+
+YDX combines simplicity with stunning output. Write clean content, get professional documentation with:
+- Glass morphism effects
+- Gradient animations  
+- Smooth transitions
+- Dark/light mode auto-detection
+
+-code(
+# Example Ruby code with Telegem
+require 'telegem'
+
+bot = Telegem::Bot.new(token: ENV['TELEGRAM_TOKEN'])
+
+# Add a command handler
+bot.command('start') do |ctx|
+  ctx.reply("🎉 Welcome to the bot!")
+end
+
+# Start polling for updates
+bot.start_polling(timeout: 10, limit: 100)
+
+puts "🤖 Bot is running!"
+)
+
+-note(This is a note block with automatic styling!)
+
+-warning(Remember to keep your API tokens secure in environment variables!)
+
+## Beautiful Components
+
+YDX supports all these stunning elements:
+
+### Images
+-img(https://images.unsplash.com/photo-1556075798-4825dfaaf498?auto=format&fit=crop&w=1200 wid=800 alt="Modern Code Editor" caption=Professional development environment)
+
+### Animated GIFs
+-gif(https://media.giphy.com/media/26tn33aiTi1jkl6H6/giphy.gif wid=600)
+
+### External Links
+-link(GitLab Official Docs https://docs.gitlab.com)
+-link(Unsplash Free Images https://unsplash.com)
+
+## Advanced Features
+
+`Inline code` looks beautiful too! The CSS includes:
+- Copy-to-clipboard buttons on code blocks
+- Smooth scrolling navigation
+- Active section highlighting
+- Mobile-responsive design
+- Print-friendly styles
+
+## API Reference Example
+
+1). bot.command(name, &block)
+
+Purpose: Handle `/commands` from users
+
+-code(
+bot.command("start") do |ctx|
+  ctx.reply("Welcome to the bot! Type /help for commands.")
+end
+)
+
+2). bot.hears(pattern, &block)
+
+Purpose: Listen for text patterns
+
+-code(
+bot.hears(/hello/i) do |ctx|
+  ctx.reply("Hello there! 👋")
+end
+)
+
+## Next Steps
+
+Start creating your `.ydx` files in the `docs-src/` directory. Each file becomes a beautiful HTML page automatically!
+
+Enjoy creating the most beautiful documentation ever! 🚀
+SAMPLE_EOF
+  
+  echo "✅ Created SUPER COOL sample documentation"
+  ydx_files=1
+fi
+
+# Convert each .ydx file
+echo "🎨 Converting .ydx files with SUPER COOL styling..."
+converted_count=0
+for ydx_file in "$DOCS_SRC"/*.ydx; do
+  [ ! -f "$ydx_file" ] && continue
+  [ "$(basename "$ydx_file")" = "script.ydx" ] && continue
+  
+  html_file="$DOCS_OUT/$(basename "${ydx_file%.ydx}").html"
+  convert_ydx_to_html "$ydx_file" "$html_file"
+  converted_count=$((converted_count + 1))
+done
+
+# Create SUPER COOL index.html
+echo "📑 Creating SUPER COOL index page..."
+cat > "$DOCS_OUT/index.html" << 'INDEX_EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitLab Docs Generator - Super Cool Edition</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+    <meta name="description" content="The most beautiful documentation generator for GitLab">
+    <meta name="theme-color" content="#6366f1">
+</head>
+<body>
+    <header class="docs-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🚀</span>
+                    <span>Super Cool Docs</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#usage">Usage</a></li>
+                    <li><a href="#format">Format</a></li>
+                    <li><a href="#docs">Documentation</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="main-content">
+            <aside class="sidebar">
+                <h3>Quick Navigation</h3>
+                <ul class="toc-list">
+                    <li><a href="#features">✨ Features</a></li>
+                    <li><a href="#usage">🚀 How to Use</a></li>
+                    <li><a href="#format">📝 .ydx Format</a></li>
+                    <li><a href="#docs">📚 Your Docs</a></li>
+                    <li><a href="#deploy">🌐 Deployment</a></li>
+                </ul>
+            </aside>
+
+            <article class="content">
+                <h1 id="features"><span class="gradient-text">✨ Super Cool Documentation Generator</span></h1>
+                <p>Transform simple <code class="code-inline">.ydx</code> files into <strong>stunning, professional documentation</strong> with automatic GitLab CI/CD deployment. The most beautiful docs you will ever create!</p>
+                
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>🎨 Glass Morphism Design</h3>
+                        <p>Modern glass effects with backdrop blur, gradients, and smooth animations that adapt to light/dark mode.</p>
+                    </div>
+                    <div class="card">
+                        <h3>⚡ Automatic Conversion</h3>
+                        <p>GitLab CI/CD converts .ydx to HTML automatically on every push. Zero manual work required.</p>
+                    </div>
+                    <div class="card">
+                        <h3>📱 Fully Responsive</h3>
+                        <p>Looks incredible on desktop, tablet, and mobile devices with adaptive layouts.</p>
+                    </div>
+                </div>
+
+                <h2 id="usage">🚀 How to Use</h2>
+                <ol>
+                    <li>Add <code class="code-inline">.ydx</code> files to the <code class="code-inline">docs-src/</code> folder</li>
+                    <li>Push your changes to GitLab</li>
+                    <li>The CI/CD pipeline automatically converts and deploys</li>
+                    <li>Visit your beautiful docs at <code class="code-inline">https://[username].gitlab.io/[project]/</code></li>
+                </ol>
+
+                <div class="alert note">
+                    <span class="alert-icon">💡</span>
+                    The generator creates a beautiful index page and styles automatically!
+                </div>
+
+                <h2 id="format">📝 .ydx Format Guide</h2>
+                <pre><code># Main Title
+1). Section Title
+Your content here with **bold** and `inline code`
+
+-code(
+Your code blocks here
+They preserve formatting
+)
+
+-note(Important note here)
+-warning(Warning message here)
+
+-img(https://example.com/image.jpg wid=800 alt="Description")
+-link(Link Text https://example.com)</code></pre>
+
+                <h2 id="docs">📚 Your Documentation</h2>
+                <p>Here are all the documentation pages generated from your <code class="code-inline">.ydx</code> files:</p>
+                <ul>
+INDEX_EOF
+
+# Add links to all generated pages
+for html_file in "$DOCS_OUT"/*.html; do
+  [ "$html_file" = "$DOCS_OUT/index.html" ] && continue
+  [ "$html_file" = "$DOCS_OUT/getting-started.html" ] && continue
+  name=$(basename "$html_file" .html)
+  pretty_name=$(echo "$name" | sed 's/-/ /g')
+  echo "                    <li><a href='$name.html'>📄 $pretty_name</a></li>" >> "$DOCS_OUT/index.html"
+done
+
+# Close index.html
+cat >> "$DOCS_OUT/index.html" << 'INDEX_EOF'
+                </ul>
+
+                <h2 id="deploy">🌐 GitLab Pages Deployment</h2>
+                <p>Your documentation is automatically deployed to <strong>GitLab Pages</strong> with this configuration:</p>
+                
+                <div class="alert note">
+                    <span class="alert-icon">🔧</span>
+                    Required <code class="code-inline">.gitlab-ci.yml</code>:
+                    <pre style="margin-top: 1rem; background: rgba(255,255,255,0.1);"><code>pages:
+  image: alpine:latest
+  script:
+    - apk add --no-cache bash
+    - chmod +x script.ydx
+    - ./script.ydx docs-src public
+  artifacts:
+    paths:
+      - public
+  only:
+    - main</code></pre>
+                </div>
+
+                <div class="card" style="margin-top: 2rem;">
+                    <h3>🚀 Ready to Go!</h3>
+                    <p>Your documentation site is now live at:</p>
+                    <p style="text-align: center; margin: 1rem 0;">
+                        <code class="code-inline" style="font-size: 1.1rem;">https://[username].gitlab.io/[project]/</code>
+                    </p>
+                    <p>Add more <code class="code-inline">.ydx</code> files to <code class="code-inline">docs-src/</code> and push to update automatically!</p>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer class="docs-footer">
+        <div class="footer-content">
+            <div>
+                <p>🚀 GitLab Docs Generator v3.0</p>
+                <p>Super Cool CSS Edition</p>
+            </div>
+            <div>
+                <p>📅 Generated on $(date "+%B %d, %Y")</p>
+                <p>✨ Glass Morphism • Gradients • Animations</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Add the same interactive features as other pages
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 100,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+    
+    // Add copy buttons to code blocks
+    document.querySelectorAll('pre code').forEach(codeBlock => {
+        const pre = codeBlock.parentElement;
+        const button = document.createElement('button');
+        button.innerHTML = '📋';
+        button.style.cssText = 'position:absolute;top:1rem;right:1rem;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.3);color:white;padding:0.25rem 0.5rem;border-radius:var(--radius-sm);cursor:pointer;font-size:0.875rem;transition:all 0.2s ease;';
+        button.addEventListener('mouseenter', () => {
+            button.style.background = 'rgba(99,102,241,0.3)';
+        });
+        button.addEventListener('mouseleave', () => {
+            button.style.background = 'rgba(99,102,241,0.2)';
+        });
+        button.addEventListener('click', () => {
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+        pre.style.position = 'relative';
+        pre.appendChild(button);
+    });
+    </script>
+</body>
+</html>
+INDEX_EOF
+
+# Final summary
+echo ""
+echo "🏆 SUCCESS! Created SUPER COOL documentation"
+echo "==========================================="
+echo "📁 Output directory: $DOCS_OUT/"
+echo "📄 Converted files: $converted_count"
+echo ""
+echo "🎨 SUPER COOL FEATURES:"
+echo "  • Glass morphism with backdrop blur"
+echo "  • Animated gradient text and backgrounds"
+echo "  • Smooth scroll animations"
+echo "  • Automatic dark/light mode"
+echo "  • Copy-to-clipboard buttons on code blocks"
+echo "  • Interactive table of contents"
+echo "  • Mobile-first responsive design"
+echo "  • Print-friendly styles"
+echo "  • Google Fonts (Inter + JetBrains Mono)"
+echo ""
+echo "🌐 Your docs will be available at:"
+echo "   https://[username].gitlab.io/[project]/"
+echo ""
+echo "🚀 Push to GitLab to see your SUPER COOL docs live!"
