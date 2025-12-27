@@ -1,0 +1,20 @@
+# .gitlab-ci.yml
+image: alpine:latest
+
+stages:
+  - deploy
+
+pages:
+  stage: deploy
+  before_script:
+    - apk add --no-cache bash
+  script:
+    # Make the script executable
+    - chmod +x script.ydx
+    # Run your converter script
+    - ./script.ydx docs-src public
+  artifacts:
+    paths:
+      - public
+  only:
+    - main  # Runs only on main branch
