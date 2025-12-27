@@ -1,0 +1,164 @@
+# In YOUR project's .gitlab-ci.yml
+image: alpine:latest
+
+stages:
+  - get-converter
+  - convert
+  - deploy
+
+variables:
+  DOCS_SRC: "docs-src"
+  DOCS_OUT: "public"
+  CONVERTER_REPO: "https://gitlab.com/ynwghosted/gitlab-docs-generated.git"
+
+# STEP 1: Get the converter script from THEIR repo
+get-converter-script:
+  stage: get-converter
+  script:
+    - |
+      echo "📥 Getting converter from $CONVERTER_REPO"
+      apk add --no-cache git
+      
+      # Clone JUST the converter files
+      git clone --depth 1 $CONVERTER_REPO /tmp/converter
+      
+      # Copy the important files
+      cp /tmp/converter/script.ydx . 2>/dev/null || echo "No script.ydx found"
+      cp /tmp/converter/.gitattributes . 2>/dev/null || echo "No .gitattributes found"
+      
+      # Optional: Copy their conversion logic
+      cp /tmp/converter/.gitlab-ci.yml ./theirs-ci.yml 2>/dev/null || true
+      
+      echo "✅ Converter script downloaded"
+  artifacts:
+    paths:
+      - script.ydx
+      - .gitattributes
+      - theirs-ci.yml
+    expire_in: 1 hour
+
+# STEP 2: Use THEIR converter on YOUR files
+convert-ydx:
+  stage: convert
+  dependencies:
+    - get-converter-script
+  script:
+    - |
+      echo "🔄 Converting YOUR .ydx files..."
+      
+      # Check if we have the converter script
+      if [ ! -f "script.ydx" ]; then
+        echo "❌ Converter script not found!"
+        exit 1
+      fi
+      
+      # Check for YOUR .ydx files
+      if [ ! -d "$DOCS_SRC" ]; then
+        echo "⚠️ No docs-src directory found"
+        mkdir -p "$DOCS_SRC"
+      fi
+      
+      YDX_COUNT=$(find "$DOCS_SRC" -name "*.ydx" 2>/dev/null | wc -l)
+      echo "📄 Found $YDX_COUNT .ydx files in YOUR project"
+      
+      if [ "$YDX_COUNT" -eq 0 ]; then
+        echo "⚠️ No .ydx files found in $DOCS_SRC/"
+        exit 0
+      fi
+      
+      # Create output directory
+      mkdir -p "$DOCS_OUT"
+      
+      # ACTUAL CONVERSION - using THEIR converter on YOUR files
+      # This is the key part from their pipeline
+      for ydx_file in "$DOCS_SRC"/*.ydx; do
+        [ ! -f "$ydx_file" ] && continue
+        
+        html_file="$DOCS_OUT/$(basename "${ydx_file%.ydx}").html"
+        
+        # Use awk converter (from their pipeline)
+        awk '
+        BEGIN {
+          print "<!DOCTYPE html>"
+          print "<html><head>"
+          print "<style>"
+          print "body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; }"
+          print "h1 { color: #2563eb; }"
+          print "h2 { color: #059669; margin-top: 30px; }"
+          print "pre { background: #f3f4f6; padding: 15px; border-radius: 5px; }"
+          print "</style>"
+          print "</head><body>"
+        }
+        /^# / {
+          gsub(/^# /, "")
+          print "<h1>" $0 "</h1>"
+          next
+        }
+        /^[0-9]+\)\./ {
+          print "<h2>" $0 "</h2>"
+          next
+        }
+        /-code\(/ {
+          in_code = 1
+          print "<pre><code>"
+          sub(/-code\(/, "", $0)
+          if ($0 != "") print $0
+          next
+        }
+        in_code && /^\)$/ {
+          in_code = 0
+          print "</code></pre>"
+          next
+        }
+        in_code {
+          print $0
+          next
+        }
+        /^$/ {
+          print "<br>"
+          next
+        }
+        {
+          print "<p>" $0 "</p>"
+        }
+        END {
+          print "</body></html>"
+        }
+        ' "$ydx_file" > "$html_file"
+        
+        echo "✅ Converted: $(basename "$ydx_file") → $(basename "$html_file")"
+      done
+      
+      # Create index.html
+      echo '<h1>Your Documentation</h1><ul>' > "$DOCS_OUT/index.html"
+      for html in "$DOCS_OUT"/*.html; do
+        [ "$(basename "$html")" = "index.html" ] && continue
+        name=$(basename "$html" .html)
+        echo "<li><a href='$name.html'>$name</a></li>" >> "$DOCS_OUT/index.html"
+      done
+      echo '</ul>' >> "$DOCS_OUT/index.html"
+      
+      echo "🎉 Conversion complete!"
+  artifacts:
+    paths:
+      - "$DOCS_OUT"
+    expire_in: 1 week
+
+# STEP 3: Deploy to GitLab Pages
+pages:
+  stage: deploy
+  dependencies:
+    - convert-ydx
+  script:
+    - |
+      echo "🌐 Deploying to GitLab Pages..."
+      if [ -d "$DOCS_OUT" ]; then
+        mv "$DOCS_OUT" public
+        echo "✅ Moved $DOCS_OUT to public/"
+      else
+        mkdir -p public
+        echo '<h1>Your Docs</h1><p>No .ydx files converted yet</p>' > public/index.html
+      fi
+  artifacts:
+    paths:
+      - public
