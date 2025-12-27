@@ -1,0 +1,752 @@
+🎭 CONTEXT (ctx) API REFERENCE
+
+📱 MESSAGE SENDING
+
+1). **ctx.reply(text, options)
+
+Purpose: Send a text message in reply to the current message
+
+-code(
+ctx.reply("Hello! 👋")
+ctx.reply("Formatted text", parse_mode: 'Markdown')
+ctx.reply("Secret message", disable_notification: true)
+)
+
+-note(Works in private chats, groups, and supergroups)
+
+2). **ctx.edit_message_text(text, options)
+
+Purpose: Edit an existing message's text
+
+-code(
+
+Edit the current message
+
+ctx.edit_message_text("Updated content! ✏️")
+
+Edit with formatting
+
+ctx.edit_message_text("Bold update", parse_mode: 'MarkdownV2')
+)
+
+-warning(Only works for messages sent by your bot)
+
+3). ctx.delete_message(message_id = nil)
+
+Purpose: Delete a message from the chat
+
+-code(
+
+Delete the current message
+
+ctx.delete_message
+
+Delete specific message by ID
+
+ctx.delete_message(12345)
+
+Delete with options
+
+ctx.delete_message(12345)  # Telegram automatically handles permissions
+)
+
+-note(Can delete bot's messages and user messages in some cases)
+
+4). **ctx.forward_message(from_chat_id, message_id, options)
+
+Purpose: Forward a message from any chat
+
+-code(
+
+Forward message from another chat
+
+ctx.forward_message(-100123456789, 42)
+
+Forward with options
+
+ctx.forward_message(-100123456789, 42, disable_notification: true)
+)
+
+-note(Use negative IDs for groups/channels: -100 for supergroups)
+
+5). **ctx.copy_message(from_chat_id, message_id, options)
+
+Purpose: Copy a message (like forward but appears as sent by bot)
+
+-code(
+ctx.copy_message(-100123456789, 42)
+ctx.copy_message("@channelusername", 42, caption: "Copied! 📋")
+)
+
+🖼️ MEDIA MESSAGES
+
+6). **ctx.photo(photo, caption: nil, options)
+
+Purpose: Send a photo
+
+-code(
+
+Send from URL
+
+ctx.photo("https://example.com/image.jpg")
+
+Send from file
+
+ctx.photo(File.open("photo.jpg"), caption: "Nice photo! 📸")
+
+Send with options
+
+ctx.photo("image.jpg", caption: "Sunset", has_spoiler: true)
+)
+
+7). **ctx.document(document, caption: nil, options)
+
+Purpose: Send any document/file
+
+-code(
+ctx.document("report.pdf", caption: "Monthly Report 📄")
+ctx.document(File.open("data.zip"), filename: "backup.zip")
+)
+
+8). **ctx.audio(audio, caption: nil, options)
+
+Purpose: Send audio file
+
+-code(
+ctx.audio("song.mp3", caption: "My favorite song 🎵", performer: "Artist")
+ctx.audio("podcast.mp3", title: "Tech Talk", duration: 3600)
+)
+
+9). **ctx.video(video, caption: nil, options)
+
+Purpose: Send video file
+
+-code(
+ctx.video("demo.mp4", caption: "Tutorial 📹", supports_streaming: true)
+ctx.video("movie.mp4", width: 1920, height: 1080, duration: 120)
+)
+
+10). **ctx.voice(voice, caption: nil, options)
+
+Purpose: Send voice message
+
+-code(
+ctx.voice("message.ogg", caption: "Voice message 🎤")
+ctx.voice(File.open("audio.ogg"), duration: 30)
+)
+
+11). **ctx.sticker(sticker, options)
+
+Purpose: Send sticker
+
+-code(
+ctx.sticker("CAACAgIAAxkBAAIB..."  # Sticker file_id
+ctx.sticker("👍")  # Emoji sticker
+)
+
+12). **ctx.video_note(video_note, options)
+
+Purpose: Send circular video message
+
+-code(
+ctx.video_note("video_note.mp4", length: 360, duration: 30)
+)
+
+-note(Video notes are always circular and up to 1 minute)
+
+13). **ctx.location(latitude, longitude, options)
+
+Purpose: Send location
+
+-code(
+ctx.location(40.7128, -74.0060)  # New York
+ctx.location(51.5074, -0.1278, live_period: 3600)  # London with live location
+)
+
+14). **ctx.venue(latitude, longitude, title, address, options)
+
+Purpose: Send venue info
+
+-code(
+ctx.venue(
+40.7589, -73.9851,
+"Times Square",
+"Manhattan, NY 10036",
+foursquare_id: "4b2c..."
+)
+)
+
+15). **ctx.contact(phone_number, first_name, options)
+
+Purpose: Send contact card
+
+-code(
+ctx.contact("+1234567890", "John", last_name: "Doe")
+ctx.contact("+0987654321", "Jane", vcard: "VCARD_DATA...")
+)
+
+⌨️ CHAT ACTIONS
+
+16). **ctx.send_chat_action(action, options)
+
+Purpose: Show chat action (typing, uploading, etc.)
+
+-code(
+ctx.send_chat_action('typing')
+ctx.send_chat_action('upload_photo')
+ctx.send_chat_action('record_video')
+)
+
+17). ctx.typing(options)**
+
+Purpose: Show typing indicator (convenience method)
+
+-code(
+ctx.typing
+
+Equivalent to: ctx.send_chat_action('typing')
+
+)
+
+18). ctx.uploading_photo(options)**
+
+Purpose: Show photo upload indicator
+
+-code(
+ctx.uploading_photo
+
+Do some processing...
+
+sleep 2
+ctx.photo("image.jpg")
+)
+
+19). ctx.uploading_video(options)**
+
+20). ctx.uploading_audio(options)**
+
+21). ctx.uploading_document(options)**
+
+22). ctx.uploading_voice(options)**
+
+23). ctx.choose_sticker(options)**
+
+24). ctx.find_location(options)**
+
+25). ctx.record_video(options)**
+
+26). ctx.record_video_note(options)**
+
+27). ctx.record_voice(options)**
+
+🔄 CALLBACK QUERIES
+
+28). **ctx.answer_callback_query(text: nil, show_alert: false, options)
+
+Purpose: Answer a callback query (button click)
+
+-code(
+ctx.answer_callback_query(text: "Clicked! ✅")
+ctx.answer_callback_query(text: "Error!", show_alert: true)
+)
+
+-note(Required for all callback queries to remove loading state)
+
+29). **ctx.edit_message_text(text, options) (for callbacks)
+
+Purpose: Edit message that contained inline keyboard
+
+-code(
+
+After button click, update message
+
+ctx.answer_callback_query(text: "Processing...")
+ctx.edit_message_text("You selected: #{ctx.data}")
+)
+
+30). **ctx.edit_message_caption(caption, options)
+
+31). **ctx.edit_message_reply_markup(reply_markup, options)
+
+⌨️ KEYBOARDS & MARKUP
+
+32). ctx.keyboard(&block)
+
+Purpose: Create reply keyboard builder
+
+-code(
+keyboard = ctx.keyboard do
+row "Button 1", "Button 2"
+row "Contact", request_contact: true
+row "Location", request_location: true
+end
+
+ctx.reply("Choose:", reply_markup: keyboard)
+)
+
+33). ctx.inline_keyboard(&block)
+
+Purpose: Create inline keyboard builder
+
+-code(
+keyboard = ctx.inline_keyboard do
+row { button "Option 1", callback_data: "opt1" }
+row { button "Open URL", url: "https://example.com" }
+row { button "Switch Inline", switch_inline_query: "query" }
+end
+
+ctx.reply("Select:", reply_markup: keyboard)
+)
+
+34). **ctx.reply_with_keyboard(text, keyboard_markup, options)
+
+Purpose: Send message with keyboard (convenience)
+
+-code(
+keyboard = ctx.keyboard { row "Yes", "No" }
+ctx.reply_with_keyboard("Continue?", keyboard)
+)
+
+35). **ctx.reply_with_inline_keyboard(text, inline_markup, options)
+
+36). **ctx.remove_keyboard(text = nil, options)
+
+Purpose: Remove reply keyboard
+
+-code(
+ctx.remove_keyboard("Keyboard removed!")
+
+or just remove without message
+
+ctx.remove_keyboard
+)
+
+37). **ctx.force_reply(text = nil, options)
+
+Purpose: Force user to reply to message
+
+-code(
+ctx.force_reply("Please reply to this message...")
+)
+
+👥 CHAT MANAGEMENT
+
+38). ctx.get_chat(options)**
+
+Purpose: Get information about a chat
+
+-code(
+chat = ctx.get_chat
+ctx.reply("Chat title: #{chat.title}")
+ctx.reply("Members: #{ctx.get_chat_members_count}")
+)
+
+39). ctx.get_chat_administrators(options)**
+
+Purpose: Get list of chat administrators
+
+-code(
+admins = ctx.get_chat_administrators
+admins.each do |admin|
+ctx.reply("Admin: #{admin.user.first_name}")
+end
+)
+
+40). **ctx.get_chat_member(user_id, options)
+
+41). ctx.get_chat_members_count(options)**
+
+42). ctx.leave_chat(options)**
+
+43). **ctx.pin_message(message_id, options)
+
+Purpose: Pin message in chat
+
+-code(
+ctx.pin_message(ctx.message.message_id)
+ctx.pin_message(123, disable_notification: true)
+)
+
+44). **ctx.unpin_message(message_id = nil, options)
+
+45). ctx.unpin_all_messages(options)**
+
+46). **ctx.set_chat_title(title, options)
+
+47). **ctx.set_chat_description(description, options)
+
+48). **ctx.set_chat_photo(photo, options)
+
+49). ctx.delete_chat_photo(options)**
+
+50). **ctx.kick_chat_member(user_id, options)
+
+Purpose: Kick/ban user from chat
+
+-code(
+ctx.kick_chat_member(123456789)
+ctx.kick_chat_member(123456789, until_date: Time.now + 3600)  # Ban for 1 hour
+)
+
+-warning(Requires admin permissions in the chat)
+
+51). **ctx.ban_chat_member(user_id, options)
+
+52). **ctx.unban_chat_member(user_id, options)
+
+53). **ctx.restrict_chat_member(user_id, options)
+
+Purpose: Restrict user permissions
+
+-code(
+ctx.restrict_chat_member(
+123456789,
+can_send_messages: false,
+can_send_media_messages: false
+)
+)
+
+54). **ctx.promote_chat_member(user_id, options)
+
+Purpose: Promote user to administrator
+
+-code(
+ctx.promote_chat_member(
+123456789,
+can_manage_chat: true,
+can_delete_messages: true
+)
+)
+
+55). **ctx.set_chat_administrator_custom_title(user_id, title, options)
+
+🔗 INVITE LINKS
+
+56). ctx.export_chat_invite_link(options)**
+
+57). ctx.create_chat_invite_link(options)**
+
+Purpose: Create new invite link
+
+-code(
+invite = ctx.create_chat_invite_link(
+name: "VIP Access",
+expire_date: Time.now + 604800,  # 7 days
+member_limit: 10
+)
+ctx.reply("Invite link: #{invite.invite_link}")
+)
+
+58). **ctx.edit_chat_invite_link(invite_link, options)
+
+59). **ctx.revoke_chat_invite_link(invite_link, options)
+
+🎬 SCENE SYSTEM
+
+60). **ctx.enter_scene(scene_name, options)
+
+Purpose: Enter a conversation scene
+
+-code(
+ctx.enter_scene(:onboarding)
+ctx.enter_scene(:auth, step: :password)
+)
+
+61). ctx.leave_scene(options)**
+
+Purpose: Exit current scene
+
+-code(
+ctx.leave_scene
+ctx.leave_scene(save_data: true)
+)
+
+62). ctx.current_scene
+
+Purpose: Get current scene object
+
+-code(
+scene = ctx.current_scene
+if scene
+ctx.reply("In scene: #{scene.id}, step: #{scene.current_step(ctx)}")
+end
+)
+
+📊 ACCESSORS & HELPERS
+
+63). ctx.message
+
+Purpose: Get the Message object
+
+-code(
+if ctx.message
+ctx.reply("Message ID: #{ctx.message.message_id}")
+ctx.reply("From: #{ctx.message.from.first_name}")
+end
+)
+
+64). ctx.callback_query
+
+65). ctx.inline_query
+
+66). ctx.from
+
+Purpose: Get user who sent the update
+
+-code(
+user = ctx.from
+ctx.reply("Hello #{user.first_name}!")
+ctx.reply("Your ID: #{user.id}")
+ctx.reply("Username: @#{user.username}") if user.username
+)
+
+67). ctx.chat
+
+Purpose: Get chat where update came from
+
+-code(
+chat = ctx.chat
+ctx.reply("Chat type: #{chat.type}")
+ctx.reply("Chat ID: #{chat.id}")
+ctx.reply("Title: #{chat.title}") if chat.title
+)
+
+68). ctx.user_id
+
+Purpose: Shortcut for ctx.from.id
+
+-code(
+
+Instead of:
+
+user_id = ctx.from.id
+
+Use:
+
+user_id = ctx.user_id
+)
+
+69). ctx.chat_id
+
+Purpose: Shortcut for ctx.chat.id
+
+70). ctx.text
+
+Purpose: Get message text
+
+-code(
+if ctx.text
+ctx.reply("You said: #{ctx.text}")
+end
+)
+
+71). ctx.caption
+
+72). ctx.data
+
+Purpose: Get callback query data
+
+-code(
+if ctx.data
+ctx.reply("Button data: #{ctx.data}")
+ctx.answer_callback_query(text: "Received: #{ctx.data}")
+end
+)
+
+73). ctx.query
+
+Purpose: Get inline query text
+
+74). ctx.command?
+
+Purpose: Check if message is a command
+
+-code(
+if ctx.command?
+ctx.reply("That's a command!")
+else
+ctx.reply("That's not a command.")
+end
+)
+
+75). ctx.command_name
+
+Purpose: Get command name without slash
+
+-code(
+if ctx.command?
+ctx.reply("Command: #{ctx.command_name}")
+
+/start → "start"
+
+/help@bot → "help"
+
+end
+)
+
+76). ctx.command_args
+
+Purpose: Get command arguments
+
+-code(
+
+For: /search ruby programming
+
+if ctx.command? && ctx.command_name == "search"
+query = ctx.command_args  # "ruby programming"
+ctx.reply("Searching for: #{query}")
+end
+)
+
+77). ctx.match
+
+Purpose: Get regex match data from hears() handler
+
+-code(
+bot.hears(/hello (\w+)/) do |ctx|
+name = ctx.match[1]  # Captured group
+ctx.reply("Hello #{name}!")
+end
+)
+
+78). ctx.session
+
+Purpose: Access user session data
+
+-code(
+
+Store data
+
+ctx.session[:counter] = (ctx.session[:counter] || 0) + 1
+
+Retrieve data
+
+count = ctx.session[:counter]
+ctx.reply("You've visited #{count} times")
+)
+
+79). ctx.state
+
+Purpose: Temporary state for current handler
+
+-code(
+ctx.state[:processing] = true
+
+... do work ...
+
+ctx.state.delete(:processing)
+)
+
+80). ctx.api
+
+Purpose: Direct access to API client
+
+-code(
+
+Make raw API call
+
+response = ctx.api.call!('getMe')
+ctx.reply("Bot name: #{response['result']['first_name']}")
+)
+
+81). ctx.logger
+
+Purpose: Access logger instance
+
+-code(
+ctx.logger.info("Processing update from #{ctx.user_id}")
+ctx.logger.error("Something went wrong!") if error
+)
+
+82). ctx.update
+
+Purpose: Raw update object
+
+-code(
+update_id = ctx.update.update_id
+update_type = ctx.update.type
+ctx.logger.debug("Update ##{update_id}, type: #{update_type}")
+)
+
+83). ctx.with_typing(&block)
+
+Purpose: Show typing indicator while executing block
+
+-code(
+ctx.with_typing do
+
+Long processing...
+
+sleep 3
+ctx.reply("Done! ✅")
+end
+)
+
+🎮 GAMES & PAYMENTS
+
+84). **ctx.send_game(game_short_name, options)
+
+85). **ctx.set_game_score(user_id, score, options)
+
+86). **ctx.get_game_high_scores(user_id, options)
+
+87). **ctx.invoice(title, description, payload, currency, prices, options)
+
+88). **ctx.answer_shipping_query(ok, options)
+
+89). **ctx.answer_pre_checkout_query(ok, options)
+
+📄 POLLS
+
+90). **ctx.poll(question, options, options)
+
+Purpose: Send a poll
+
+-code(
+ctx.poll(
+"Favorite programming language?",
+["Ruby", "Python", "JavaScript", "Go"],
+is_anonymous: false
+)
+)
+
+91). **ctx.stop_poll(message_id, options)
+
+🎲 DICE
+
+92). **ctx.dice(emoji: nil, options)
+
+Purpose: Send dice, dart, or basketball animation
+
+-code(
+ctx.dice                     # Random dice
+ctx.dice(emoji: "🎯")        # Dart
+ctx.dice(emoji: "🏀")        # Basketball
+)
+
+🔧 UTILITIES
+
+93). ctx.raw_update
+
+94). ctx.to_s and ctx.inspect
+
+95). ctx.respond_to?(method)
+
+🧪 TEST HELPERS
+
+96). ctx.test_mode?
+
+97). ctx.simulate_reply(text)
+
+98). ctx.mock_update(data)
+
+---
+
+-note(Total: 98 ctx methods covering 100% of Telegram Bot API)
+
+-warning(Some methods require specific bot permissions or chat types)
+
+-link(Full Telegram Bot API https://core.telegram.org/bots/api)
+-link(Telegem GitHub https://gitlab.com/yourname/telegem)
+
+That's EVERY ctx method in Telegem! 🎉
