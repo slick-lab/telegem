@@ -26,7 +26,7 @@ Step 1: Get Your Bot Token
 2. Send /newbot and follow the prompts
 3. Copy your token (looks like: 1234567890:ABCdefGHIjklMNOpqrsTUVwxyz)
 
-<img src="Bot-registration_.png" width="600" alt="BotFather Conversation">
+<img src="Bot-registration_.PNG" width="600" alt="BotFather Conversation">
 
 
 Step 2: Create Your Bot
