@@ -1,4 +1,4 @@
-```markdown
+
 # Context API Reference
 
 The `Telegem::Core::Context` object provides access to the current update and helper methods for responding.
