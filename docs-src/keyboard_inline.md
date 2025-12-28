@@ -1,4 +1,4 @@
-```markdown
+
 # Keyboards & Inline Keyboards Guide
 
 Learn how to create interactive buttons for your Telegram bot.
