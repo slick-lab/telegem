@@ -173,7 +173,7 @@ module Telegem
           end
         end
         
-        sleep 1 until @server.running?
+        sleep 1 until @server.running
       end
       
       def handle_rack_request(req)
