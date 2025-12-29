@@ -1,12 +1,13 @@
 require 'json'
 require 'telegem'
-requids 'sqlite3'
-  
+require 'sqlite3'
+require 'fileutils'
+
 
 require_relative './handlers/start'
-require_relative './handlers/add(1)'
+require_relative './handlers/add_1_'
 require_relative './handlers/premium'
-require_relative './handlers/add(2)'
+require_relative './handlers/add_2_'
 require_relative './handlers/sponsor'
 require_relative './handlers/watch'
 require_relative './handlers/report'
