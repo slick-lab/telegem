@@ -1,4 +1,4 @@
-clads StartHandler 
+class StartHandler 
     def initiliaze(bot, db)
       @bot = bot
       @db = db
