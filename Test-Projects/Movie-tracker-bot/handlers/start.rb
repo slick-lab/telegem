@@ -45,6 +45,4 @@ clads StartHandler
     )
   SQL
     end 
-end 
-
       
