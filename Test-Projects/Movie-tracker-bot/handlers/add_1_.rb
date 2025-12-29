@@ -108,6 +108,7 @@ class AddHandler
     end
     
     ctx.reply(response, parse_mode: 'Markdown')
+  end 
   
   def setup_my_shows_command
     @bot.command("myshows") do |ctx|
