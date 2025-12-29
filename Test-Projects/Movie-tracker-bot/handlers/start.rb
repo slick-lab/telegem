@@ -1,5 +1,5 @@
 class StartHandler 
-    def initiliaze(bot, db)
+    def initialize(bot, db)
       @bot = bot
       @db = db
       start_command
