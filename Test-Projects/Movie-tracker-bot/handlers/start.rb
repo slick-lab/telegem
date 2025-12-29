@@ -4,7 +4,7 @@ class StartHandler
       @db = db
       start_command
       create_tables
-     end 
+    end 
    def start_command
      @bot.command("start") do |ctx|
         ctx.reply("welcome to MOVIE_FLIx") 
@@ -45,4 +45,4 @@ class StartHandler
     )
   SQL
     end 
-      
+end
