@@ -1,5 +1,6 @@
 require 'json'
 require 'telegem'
+requids 'sqlite3'
   
 
 require_relative './handlers/start'
@@ -15,8 +16,19 @@ bot_token = ENV['BOT_TOKEN']
 
   bot = Telegem.new(ENV['BOT_TOKEN'])
  puts "token is #{bot_token[0..10]}"
+ # In your code:
+@db = SQLite3::Database.new "movieflix.db"
 
-puts "required all files"
+puts "started sqlite"
+
+StartHandler.new(bot, db)
+SearchHandler.new(bot, db)
+WatchHandler.new(bot, db)
+HelpHandler.new(bot)
+PremiumHandler.new(bot)
+SponsorHandler.new(bot)
+AddHandler.new(bot, db)
+AddHears.new(bot, db)
 
   port = (ENV['PORT'] || 3000).to_i
   puts "  📍 Using port: #{port}"
