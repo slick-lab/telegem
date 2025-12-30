@@ -18,7 +18,7 @@ bot_token = ENV['BOT_TOKEN']
   bot = Telegem.new(ENV['BOT_TOKEN'])
  puts "token is #{bot_token[0..10]}"
  # In your code:
-@db = SQLite3::Database.new "movieflix.db"
+ db = SQLite3::Database.new "movieflix.db"
 
 puts "started sqlite"
 
