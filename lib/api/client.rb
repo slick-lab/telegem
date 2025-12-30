@@ -10,6 +10,7 @@ module Telegem
 
       def initialize(token, **options)
         @token = token
+        @mutex = Mutex.new
         @logger = options[:logger] || Logger.new($stdout)
         timeout = options[:timeout] || 30
         
@@ -34,6 +35,7 @@ module Telegem
       end
 
       def call!(method, params = {})
+        @mutex.synchroniz do 
         url = "#{BASE_URL}/bot#{@token}/#{method}"
         
         @logger.debug("API Call (sync): #{method}") if @logger
@@ -52,6 +54,7 @@ module Telegem
         end
         
         nil
+        end 
       end
 
       def upload(method, params)
