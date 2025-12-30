@@ -42,7 +42,7 @@ AddHears.new(bot, db)
   # Minimal health check server
   Thread.new do
     require 'socket'
-    server = TCPServer.new('0.0.0.0', ENV['PORT'] || 10000)
+    server = TCPServer.new('0.0.0.0', port || 10000)
     puts "✅ Health check server listening on port #{ENV['PORT'] || 10000}"
     
     loop do
@@ -56,5 +56,7 @@ AddHears.new(bot, db)
       client.puts "Telegram Bot is running"
       client.close
     end
+    puts "bot is running "
+      sleep
   end 
    
