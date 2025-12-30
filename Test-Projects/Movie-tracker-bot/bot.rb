@@ -57,6 +57,6 @@ AddHears.new(bot, db)
       client.close
     end
     puts "bot is running "
-      sleep
   end 
-   
+   sleep
+   puts "bot is running alive now "
