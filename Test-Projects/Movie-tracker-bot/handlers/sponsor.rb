@@ -7,7 +7,7 @@ class SponsorHandler
     @bot.hears("🤠sponsor") do |ctx|
           ctx.typing
              sleep 5
-      ctx.reply(" ultimately your application will be viewed by **board**" parse_mode: 'Markdown')
+      ctx.reply("utimately your application will be viewed by the board")
       ctx.reply("chat with our board @darksnipe")
     end 
   end 
