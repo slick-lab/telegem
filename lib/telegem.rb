@@ -3,7 +3,7 @@ require 'logger'
 require 'json'
 
 module Telegem
-  VERSION = "2.0.9".freeze
+  VERSION = "2.1.0".freeze
 end
 
 # Load core components
