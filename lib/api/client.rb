@@ -35,7 +35,7 @@ module Telegem
       end
 
       def call!(method, params = {})
-        @mutex.synchroniz do 
+        @mutex.synchronize do 
         url = "#{BASE_URL}/bot#{@token}/#{method}"
         
         @logger.debug("API Call (sync): #{method}") if @logger
