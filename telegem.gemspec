@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://gitlab.com/ruby-telegem/telegem"
   spec.license       = "MIT"
   
-  spec.required_ruby_version = ">= 2.7.0"
+  spec.required_ruby_version = ">= 3.1.0"
   
   # Specify which files should be added to the gem
   spec.files = Dir.chdir(__dir__) do
@@ -49,19 +49,13 @@ Gem::Specification.new do |spec|
     "source_code_uri" => spec.homepage,
     "changelog_uri" => "#{spec.homepage}/-/blob/main/CHANGELOG.md",
     "bug_tracker_uri" => "#{spec.homepage}/-/issues",
-    "documentation_uri" => "#{spec.homepage}/-/blob/main/README.md",
+    "documentation_uri" => "https://gitlab.com/ruby-telegem/telegem/-/tree/main/docs-src?ref_type=heads"
     "rubygems_mfa_required" => "false"
   }
   
   # Post-install message
   spec.post_install_message = <<~MSG
     Thanks for installing Telegem #{Telegem::VERSION}!
-    
-    Quick start:
-      bot = Telegem.new("YOUR_TOKEN")
-      bot.on(:message) { |ctx| ctx.reply("Hello!") }
-      bot.start_polling
-    
     Documentation: #{spec.homepage}
     Happy bot building! 🤖
   MSG
