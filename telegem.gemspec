@@ -49,7 +49,7 @@ Gem::Specification.new do |spec|
     "source_code_uri" => spec.homepage,
     "changelog_uri" => "#{spec.homepage}/-/blob/main/CHANGELOG.md",
     "bug_tracker_uri" => "#{spec.homepage}/-/issues",
-    "documentation_uri" => "https://gitlab.com/ruby-telegem/telegem/-/tree/main/docs-src?ref_type=heads"
+    "documentation_uri" => "https://gitlab.com/ruby-telegem/telegem/-/tree/main/docs-src?ref_type=heads",
     "rubygems_mfa_required" => "false"
   }
   
