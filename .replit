@@ -1,0 +1,13 @@
+run = "bundle exec ruby main.rb"
+hidden = [".bundle"]
+entrypoint = "main.rb"
+modules = ["ruby-3.2"]
+
+[nix]
+channel = "stable-24_05"
+
+[gitHubImport]
+requiredFiles = [".replit", "replit.nix"]
+
+[agent]
+expertMode = true
