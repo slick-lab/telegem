@@ -32,32 +32,49 @@ module Telegem
         @logger.debug("API Call: #{method}") if @logger
         @http.post(url, json: params.compact).wait  
       end
-        def call!(method, params, &callback)
-          url = "#{BASE_URL}/bot#{@token}/#{method}" 
-
-          @http.post(url, json: params)
-            .on_complete do |response|
-              if response.status == 200
-                json = response.json
-                if json && json['ok']
-                  callback.call(json['result']) if callback
-                  @logger.debug("API Response: #{json}") if @logger
-                else
-                  error_msg = json ? json['description'] : "No JSON response"
-                  error_code = json['error_code'] if json
-                  raise APIError.new("API Error: #{error_msg}", error_code)
-                end
-              else
-                raise NetworkError.new("HTTP #{response.status}")
-              end
-            rescue JSON::ParserError
-              raise NetworkError.new("Invalid JSON response")
-            rescue => e
-              raise e
-            end
-            .on_error { |error| callback.call(nil, error) if callback }
+        def call!(method, params = {}, &callback)
+  url = "#{BASE_URL}/bot#{@token}/#{method}"
+  
+  # Ensure we have callbacks plugin
+  http_client = @http.plugin(:callbacks) unless @http.plugins.include?(:callbacks)
+  
+  # Make the request
+  request = http_client.post(url, json: params.compact)
+  
+  # Set up response handler
+  request.on_response_completed do |response|
+    begin
+      if response.status == 200
+        json = response.json
+        if json && json['ok']
+          # Success: callback with result
+          callback.call(json['result'], nil) if callback
+          @logger.debug("API Response: #{json}") if @logger
+        else
+          # API error (non-200 OK)
+          error_msg = json ? json['description'] : "No JSON response"
+          error_code = json['error_code'] if json
+          callback.call(nil, APIError.new("API Error: #{error_msg}", error_code)) if callback
         end
-
+      else
+        # HTTP error
+        callback.call(nil, NetworkError.new("HTTP #{response.status}")) if callback
+      end
+    rescue JSON::ParserError
+      callback.call(nil, NetworkError.new("Invalid JSON response")) if callback
+    rescue => e
+      callback.call(nil, e) if callback
+    end
+  end
+  
+  # Set up network error handler
+  request.on_request_error do |error|
+    callback.call(nil, error) if callback
+  end
+  
+  # Return the request (optional, for compatibility)
+  request
+end
       def upload(method, params)
         url = "#{BASE_URL}/bot#{@token}/#{method}"
         
