@@ -143,7 +143,12 @@ module Telegem
 
         @logger.debug "Fetching updates with offset: #{@offset}"
 
-        @api.call!('getUpdates', params) do |updates_array|
+        @api.call!('getUpdates', params) do |updates_array, error|
+         if error 
+           @logger.error "Polling error: #{error.message}"
+           completion_callback.call(nil, error) if completion_callback
+           else 
+
           # Success
           if updates_array && updates_array.is_a?(Array)
             result = { 'ok' => true, 'result' => updates_array }
@@ -151,11 +156,8 @@ module Telegem
           else
             completion_callback.call(nil) if completion_callback
           end
-        end.on_error do |error|
-          # Network/HTTP error
-          @logger.error "Polling error: #{error.message}"
-          completion_callback.call(nil, error) if completion_callback
-        end
+         end 
+       end
       end
          
             
