@@ -34,33 +34,33 @@ module Telegem
       end
         def call!(method, params = {}, &callback)
          url = "#{BASE_URL}/bot#{@token}/#{method}"
-           @http
-  request = @http.post(url, json: params.compact)
+           
+         request = @http.post(url, json: params.compact)
   
   # Set up response handler
-  request.on_response_completed do |response|
-    begin
-      if response.status == 200
+       request.on_response_completed do |response|
+        begin
+          if response.status == 200
         json = response.json
-        if json && json['ok']
+           if json && json['ok']
           # Success: callback with result
           callback.call(json['result'], nil) if callback
           @logger.debug("API Response: #{json}") if @logger
-        else
+           else
           # API error (non-200 OK)
           error_msg = json ? json['description'] : "No JSON response"
           error_code = json['error_code'] if json
           callback.call(nil, APIError.new("API Error: #{error_msg}", error_code)) if callback
-        end
-      else
+          end
+        else
         # HTTP error
         callback.call(nil, NetworkError.new("HTTP #{response.status}")) if callback
+       end
+        rescue JSON::ParserError
+         callback.call(nil, NetworkError.new("Invalid JSON response")) if callback
+         rescue => e
+         callback.call(nil, e) if callback
       end
-    rescue JSON::ParserError
-      callback.call(nil, NetworkError.new("Invalid JSON response")) if callback
-    rescue => e
-      callback.call(nil, e) if callback
-    end
   end
   
   # Set up network error handler
