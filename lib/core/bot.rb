@@ -43,7 +43,7 @@ module Telegem
         
         @logger.info "🛑 Shutting down bot..."
         @running = false
-        enc 
+      end 
       def running?
         @running
       end
@@ -281,5 +281,4 @@ module Telegem
       end
     end
   end
-  end 
 end 
