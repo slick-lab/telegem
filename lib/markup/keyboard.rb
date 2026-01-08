@@ -152,16 +152,16 @@ module Telegem
       end
 
       def to_h
-          objects
-             keyboard_rows = @buttons.map { |row| 
-             row = row.is_a?(Array) ? row : [row]
-               row.select { |btn| btn.is_a?(Hash) }  
-              }.reject(&:empty?)  # Remove empty rows
-         {
-           inline_keyboard: keyboard_rows
-          }
-       end 
-
+  # Keep only hash buttons
+    clean_rows = @buttons.map do |row|
+    row = row.is_a?(Array) ? row : [row]
+    row.select { |btn| btn.is_a?(Hash) }
+  end.reject(&:empty?)
+  
+  {
+    inline_keyboard: clean_rows
+  }
+   end 
       def to_json(*args)
         to_h.to_json(*args)
       end
