@@ -1,0 +1,83 @@
+image: alpine:latest
+
+stages:
+  - build
+  - deploy
+
+pages:
+  stage: deploy
+  script:
+    - apk add --no-cache python3 py3-pip
+    - pip3 install markdown
+    - mkdir -p public
+    
+    - |
+      for file in docs-src/*.md; do
+        if [ -f "$file" ]; then
+          filename=$(basename "$file" .md)
+          python3 -c "
+          import markdown
+          import sys
+          
+          with open('$file', 'r', encoding='utf-8') as f:
+              content = f.read()
+          
+          html = markdown.markdown(content, extensions=['extra', 'toc', 'codehilite'])
+          
+          with open('public/${filename}.html', 'w', encoding='utf-8') as f:
+              f.write('''<!DOCTYPE html>
+              <html>
+              <head>
+                  <meta charset=\"UTF-8\">
+                  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+                  <title>${filename}</title>
+                  <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css\">
+                  <script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js\"></script>
+                  <script>hljs.highlightAll();</script>
+                  <style>body{font-family:sans-serif;line-height:1.6;max-width:800px;margin:0 auto;padding:20px;}code{background:#f4f4f4;padding:2px 5px;border-radius:3px;}pre{background:#f4f4f4;padding:15px;border-radius:5px;overflow:auto;}.toc{background:#f8f9fa;padding:15px;border-radius:5px;margin-bottom:20px;}h1,h2,h3,h4,h5,h6{color:#333;}a{color:#0066cc;}a:hover{text-decoration:underline;}</style>
+              </head>
+              <body><div class=\"container\">''' + html + '''</div></body></html>''')
+        fi
+      done
+    
+    - |
+      if [ ! -f "public/index.html" ]; then
+        cat > public/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Documentation</title>
+            <style>body{font-family:sans-serif;line-height:1.6;max-width:800px;margin:0 auto;padding:40px 20px;}h1{color:#333;border-bottom:2px solid #eee;padding-bottom:10px;}ul{list-style:none;padding:0;}li{margin:10px 0;}a{color:#0066cc;text-decoration:none;font-size:18px;padding:8px 12px;display:block;}a:hover{background:#f5f5f5;}</style>
+        </head>
+        <body>
+            <h1>Documentation</h1>
+            <ul id="files"></ul>
+            <script>
+                fetch('.')
+                    .then(r=>r.text())
+                    .then(d=>{
+                        const p=new DOMParser();
+                        const h=p.parseFromString(d,'text/html');
+                        const l=Array.from(h.querySelectorAll('a[href$=".html"]')).filter(a=>!a.href.includes('index.html'));
+                        const ul=document.getElementById('files');
+                        l.forEach(a=>{
+                            const li=document.createElement('li');
+                            const link=document.createElement('a');
+                            link.href=a.getAttribute('href');
+                            link.textContent=a.getAttribute('href').replace('.html','').replace(/_/g,' ');
+                            li.appendChild(link);
+                            ul.appendChild(li);
+                        });
+                    });
+            </script>
+        </body>
+        </html>
+        EOF
+      fi
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
