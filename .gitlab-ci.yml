@@ -1,0 +1,53 @@
+image: ruby:3.3
+
+stages:
+  - test
+  - build
+
+variables:
+  BUNDLE_PATH: "vendor/bundle"
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - vendor/bundle
+
+before_script:
+  - bundle install
+
+test:
+  stage: test
+  script:
+    - bundle exec rspec test/spec.rb
+
+test:3.1:
+  stage: test
+  image: ruby:3.1
+  script:
+    - bundle install
+    - bundle exec rspec test/spec.rb
+
+test:3.2:
+  stage: test
+  image: ruby:3.2
+  script:
+    - bundle install
+    - bundle exec rspec test/spec.rb
+
+test:3.3:
+  stage: test
+  image: ruby:3.3
+  script:
+    - bundle install
+    - bundle exec rspec test/spec.rb
+
+build:
+  stage: build
+  script:
+    - bundle exec rake build
+    - gem build telegem.gemspec
+  artifacts:
+    paths:
+      - telegem-*.gem
+  only:
+    - tags
