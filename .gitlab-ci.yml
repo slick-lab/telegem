@@ -1,0 +1,59 @@
+image: ruby:3.3
+
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  BUNDLE_PATH: "vendor/bundle"
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - vendor/bundle
+
+before_script:
+  - bundle install
+
+test:3.1:
+  stage: test
+  image: ruby:3.1
+  script:
+    - bundle exec rspec
+
+test:3.2:
+  stage: test
+  image: ruby:3.2
+  script:
+    - bundle exec rspec
+
+test:3.3:
+  stage: test
+  image: ruby:3.3
+  script:
+    - bundle exec rspec
+
+build:
+  stage: build
+  script:
+    - bundle exec rake build
+    - gem build telegem.gemspec
+  artifacts:
+    paths:
+      - telegem-*.gem
+  only:
+    - main
+    - tags
+
+deploy:
+  stage: deploy
+  script:
+    - mkdir -p ~/.gem
+    - echo ":rubygems_api_key: ${RUBYGEMS_API_KEY}" > ~/.gem/credentials
+    - chmod 0600 ~/.gem/credentials
+    - gem build telegem.gemspec
+    - gem push telegem-*.gem
+  only:
+    - tags
+  when: manual
