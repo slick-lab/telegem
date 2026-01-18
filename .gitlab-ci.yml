@@ -1,0 +1,35 @@
+
+image: ruby:3.2
+
+variables:
+  BUNDLE_PATH: vendor/bundle
+  BUNDLE_JOBS: 4
+  BUNDLE_RETRY: 3
+
+stages:
+  - test
+  - build
+
+cache:
+  paths:
+    - vendor/bundle/
+
+before_script:
+  - ruby --version
+  - gem install bundler
+  - bundle install
+
+test:
+  stage: test
+  script:
+    - bundle exec rspec test/spec.rb --require test/spec_helper.rb
+
+build:
+  stage: build
+  script:
+    - gem build telegem.gemspec
+  artifacts:
+    paths:
+      - telegem-*.gem
+  only:
+    - tags
