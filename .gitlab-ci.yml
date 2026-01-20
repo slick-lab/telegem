@@ -7,12 +7,12 @@ stages:
 
 before_script:
   - ruby --version
-  - gem install httpx concurrent-ruby async rspec
+  - gem install rspec pdf-reader docx
 
 test:
   stage: test
   script:
-    - rspec test/spec.rb --require test/spec_helper.rb
+    - rspec test/spec.rb 
 
 build:
   stage: build
