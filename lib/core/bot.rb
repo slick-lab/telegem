@@ -189,22 +189,24 @@ end
       private
       
     def poll_loop
-      last_pool_time = Time.now 
       while @running 
-        elapsed_time = Time.now - last_pool_time
-        sleep(0.5 - elapsed_time) if elapsed_time < 0.5
-        
-      fetch_updates do |result, error|
-        if error 
-          @logger.error "polling error #{error.message}"
-          sleep(2)
-         elsif result && result['ok']
-           handle_updates_response(result)
-       end 
-     end 
-     sleep 0.1
-   end 
- end
+       begin 
+        Async do |task| 
+          fetch_updates do |result, error|
+            if error 
+             @logger.error "Polling error #{error.message}"
+              task.sleep(0.2)
+               elsif result && result['ok'] 
+                handle_updates_response(result) 
+                end 
+              end 
+            end.wait
+            rescue => e 
+             @logger.error "poll loop error #{e.message}"
+             end
+             sleep 0.5 
+             end 
+            end 
      
       def fetch_updates(&completion_callback)
         params = {
