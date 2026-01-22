@@ -151,6 +151,10 @@ module Telegem
         end
       end
       
+      def download_file(file_id, destination_path = nil)
+        @bot.api.download(file_id, destination_path) 
+      end 
+      
       def sticker(sticker, **options)
         return nil unless chat
         
