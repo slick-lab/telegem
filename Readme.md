@@ -2,7 +2,14 @@ Telegem 🤖⚡
 
 Modern, blazing-fast async Telegram Bot API for Ruby - Inspired by Telegraf, built for performance.
 
-![Gem Version](https://badge.fury.io/rb/telegem.svg) ![GitLab](https://img.shields.io/badge/gitlab-telegem-orange) ![Ruby Version](https://img.shields.io/badge/Ruby-3.0+-red.svg) ![License](https://img.shields.io/badge/License-MIT-blue.svg) ![Async I/O](https://img.shields.io/badge/Async-I/O-green.svg)
+![Gem Version](https://badge.fury.io/rb/telegem.svg) ![GitLab](https://img.shields.io/badge/gitlab-telegem-orange) ![Ruby Version](https://img.shields.io/badge/Ruby-3.0+-red.svg) ![License](https://img.shields.io/badge/License-MIT-blue.svg) ![Async I/O](https://img.shields.io/badge/Async-I/O-green.svg) 
+
+![GitLab stars](https://img.shields.io/gitlab/stars/ruby-telegem/telegem?style=for-the-badge&logo=gitlab&color=orange)
+![GitLab contributors](https://img.shields.io/gitlab/contributors/ruby-telegem/telegem?style=for-the-badge&logo=gitlab)
+![GitLab last commit](https://img.shields.io/gitlab/last-commit/ruby-telegem/telegem?style=for-the-badge&logo=gitlab)
+![GitLab license](https://img.shields.io/gitlab/license/ruby-telegem/telegem?style=for-the-badge&logo=gitlab)
+
+
 
 Blazing-fast, modern Telegram Bot framework for Ruby. Inspired by Telegraf.js, built for performance with true async/await patterns.
 
