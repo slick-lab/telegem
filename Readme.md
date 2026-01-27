@@ -17,7 +17,7 @@ Blazing-fast, modern Telegram Bot framework for Ruby. Inspired by Telegraf.js, b
 
 ✨ Features
 
-- ⚡ True httpx(Async) I/O - Built on async gem, not blocking threads
+- ⚡ True Async I/O - Built on async gem, not blocking threads
 - 🎯 Telegraf-style DSL - Familiar API for JavaScript developers
 - 🔌 Middleware System - Compose behavior like Express.js
 - 🧙 Scene System - Multi-step conversations (wizards/forms)
