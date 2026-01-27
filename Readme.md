@@ -1,4 +1,4 @@
-Telegem 🤖⚡
+![Telegem Logo](https://gitlab.com/ruby-telegem/telegem/-/raw/main/assets/logo.png)
 
 Modern, blazing-fast async Telegram Bot API for Ruby - Inspired by Telegraf, built for performance.
 
