@@ -1,6 +1,6 @@
 image: ruby:3.3.8-alpine
 before_script:
-    - gem install pdf-reader rspec 
+    - gem install pdf-reader rspec httpx
 
 test: 
     script:
