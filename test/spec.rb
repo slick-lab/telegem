@@ -9,7 +9,7 @@ end
 RSpec.describe Telegem::Core::Bot do
   let(:token) { 'test_token' }
   let(:bot) { Telegem::Core::Bot.new(token) }
-
+  end
   it 'creates bot with token' do
     expect(bot.token).to eq(token)
   end
