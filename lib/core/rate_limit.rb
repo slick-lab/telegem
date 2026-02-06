@@ -88,7 +88,8 @@ module Telegem
     end
     
     def cleanup_counter(type, key, now)
-      
+      expires = @counters[type].get_ttl(key) || now
+      @counters[type].delete(key) if now > expires 
     end
     
     def rate_limit_response(ctx)
@@ -96,5 +97,5 @@ module Telegem
       ctx.reply("⏳ Please wait a moment before sending another request.") rescue nil
       nil
     end
-  end
+  end 
 end

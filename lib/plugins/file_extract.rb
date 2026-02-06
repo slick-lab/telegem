@@ -12,6 +12,8 @@ module Telegem
           auto_delete: true,
           file_type: nil
         }.merge(options)
+          unless file_id.is_a?(string) && file_id.length.between?(34, 100)
+          raise ArgumentError, "invalid telegram file id format" 
         file_path = "temp/#{@file_id}"
         download_file(file_path)
       end
@@ -32,6 +34,10 @@ module Telegem
 
       def extract_pdf(file_path)
         begin
+          file_info = @bot.api.call('getFile'. file_id: file_id)
+           if file_info['file_size'].to_i > (60 * 1024 * 1024)
+            raise "file to large (#{file_info['file_size']} > 60mb)"
+           end 
           @bot.api.download(@file_id, "#{file_path}.pdf")
           reader = PDF::Reader.new("#{file_path}.pdf")
           text = reader.pages.map(&:text).join("\n").strip
@@ -59,6 +65,10 @@ module Telegem
       end
 
       def extract_json(file_path)
+        file_info = @bot.api.call('getFile'. file_id: file_id)
+           if file_info['file_size'].to_i > (60 * 1024 * 1024)
+            raise "file to large (#{file_info['file_size']} > 60mb)"
+           end 
         @bot.api.download(@file_id, "#{file_path}.json")
         json_data = JSON.parse(File.read("#{file_path}.json"))
         if File.exist?("#{file_path}.json")
@@ -74,6 +84,10 @@ module Telegem
       end
 
       def extract_html(file_path)
+        file_info = @bot.api.call('getFile'. file_id: file_id)
+           if file_info['file_size'].to_i > (60 * 1024 * 1024)
+            raise "file to large (#{file_info['file_size']} > 60mb)"
+           end 
         destination = "#{file_path}.html"
         @bot.api.download(@file_id, destination)
         html = File.read(destination)

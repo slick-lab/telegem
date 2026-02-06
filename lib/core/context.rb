@@ -42,6 +42,82 @@ module Telegem
         inline_query&.query
       end
       
+      def message_id 
+        message&.message_id
+      end 
+
+      def message_date
+        message&.date
+      end 
+
+      def edit_date 
+        message&.edit_date
+      end 
+
+      def command_name 
+        message&.command_name
+      end 
+
+      def has_media?
+        message&.has_media? || false
+      end 
+
+      def media_type
+        message&.media_type
+      end 
+
+      def entities
+        message&.entities || []
+      end 
+
+      def caption_entities
+        message&caption_entities || []
+      end 
+      
+      def caption 
+        message&.caption 
+      end 
+
+      def reply?
+        message&.reply?
+      end 
+
+      def replied_message
+        message&.reply_to_message 
+      end 
+
+      def replied_text
+        replied_message&.text
+      end 
+
+      def replied_from 
+        replied_message&.from 
+      end 
+
+      def replied_chat
+        replied_message&.chat 
+      end 
+      
+      def update_type
+        @update.type 
+      end 
+
+      def is_edited?
+        !!@update.edited_message
+      end 
+
+      def channel_post?
+        update_type == :channel_post
+      end 
+
+      def callback_query?
+        update_type == :callback_query
+      end 
+
+      def inline_query?
+        update_type == :inline_query
+      end 
+        
       def reply(text, **options)
         return nil unless chat
         

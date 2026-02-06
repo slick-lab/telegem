@@ -152,15 +152,12 @@ module Telegem
       end
 
       def to_h
-  # Keep only hash buttons
-    clean_rows = @buttons.map do |row|
-    row = row.is_a?(Array) ? row : [row]
-    row.select { |btn| btn.is_a?(Hash) }
-  end.reject(&:empty?)
-  
-  {
-    inline_keyboard: clean_rows
-  }
+        clean_rows = @buttons.compact.map do |row| 
+          row = Array(row).compact.select { |btn| .is_a?(Hash) }
+          row.empty? ? nil : row 
+        end.compact 
+         { inline_keyboard: clean_rows} 
+      end 
    end 
       def to_json(*args)
         to_h.to_json(*args)

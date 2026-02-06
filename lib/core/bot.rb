@@ -197,6 +197,8 @@ module Telegem
         update = Types::Update.new(update_data)
         process_update(update)
       end
+
+      
       
       private
       
