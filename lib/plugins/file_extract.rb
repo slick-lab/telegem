@@ -2,6 +2,7 @@
 require 'pdf/reader'
 require 'json'
 require 'tempfile'
+require 'securerandom'
 module Telegem
   module Plugins
     class FileExtract
@@ -68,7 +69,7 @@ module Telegem
               success: false,
               error: "PDF contains no extractable text"
             }
-          end 
+          else 
           {
             success: true,
             type: :pdf,
@@ -78,6 +79,7 @@ module Telegem
               info: reader.info
             }
           }
+        end 
         rescue => e
           {
             success: false,
@@ -106,7 +108,7 @@ module Telegem
             ensure 
               cleanup if @options[:auto_delete]   
         end
-      end
+      end 
       def extract_json
         begin 
           content = File.read(@temp_file.path)
@@ -116,6 +118,7 @@ module Telegem
               success: false,
               error: "JSON file is empty or contains no data"
             }
+          else 
           {
             success: true,
             type: :json,
@@ -126,25 +129,16 @@ module Telegem
               length: data.is_a?(Array) ? data.length : nil  
           }
         } 
-        rescue => e
+      end 
+        rescue JSON::ParserError => e
           {
             success: false,
-            error: "Failed to extract JSON: #{e.message}"
+            error: "Invalid JSON format: #{e.message}"
           }
-          rescue LoadError
-            {
-              success: false,
-              error: "JSON extraction requires the 'json' gem. Please add it to your Gemfile."
-            }
-          rescue JSON::ParserError => e
-            {
-              success: false,
-              error: "Invalid JSON format: #{e.message}"
-            } 
-          ensure 
-            cleanup if @options[:auto_delete]   
-        end
-      end
+        ensure 
+          cleanup if @options[:auto_delete]   
+      end 
+
       def extract_html
         begin 
           content = File.read(@temp_file.path)
@@ -206,3 +200,4 @@ module Telegem
     end
   end
 end
+end 
