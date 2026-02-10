@@ -108,7 +108,7 @@ Perfect For:
 
 ---
 
-[📚 Documentation](https://www.rubydoc.info/gems/telegem/3.2.0/index)
+[📚 Documentation](www.rubydoc.info/gems/telegem/3.2.2/index)
 
 
 
