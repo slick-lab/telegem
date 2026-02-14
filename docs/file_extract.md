@@ -1,4 +1,4 @@
-﻿
+
 
 # Telegem::Plugins::FileExtract
 
