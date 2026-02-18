@@ -328,7 +328,48 @@ module Telegem
         !!inline_message_id
       end
     end
-    
+    class video 
+      attribute? ::qualities,Types::Array.of(VideoQuality)
+    end 
+    class VideoQuality
+      attribute :resolution, Types::String 
+      attribute :file_id, Types::String
+      attribute :file_unique_id, Types::String
+      attribute :file_size, Types::Integer
+    end 
+    class User
+      attribute? ::allows_users_to_create_topics, Types::Bool
+    end 
+
+    class ChatFullInfo
+      attribute? ::first_profile_audio, Audio
+    end 
+
+    class UniqueGift 
+      attribute? :rarity, Types::String
+      attribute? :is_burned, Types::Bool
+    end 
+
+    class Message
+      attribute? :chat_owner_left, ChatOwnerLeft
+      attribute? :chat_owner_changed, ChatOwnerChanged
+    end 
+    class ChatOwnerLeft
+      attribute :data, Types::Integer
+    end 
+
+    class ChatOwnerChanged
+      attribute :old_owner_id, Types::Integer
+      attribute :new_owner_id, Types::Integer
+       attribute :data, Types::Integer
+    end 
+
+    class UserProfileAudios
+      attribute :audios, Types::Array.of(Audio)
+      attribute :total_count, Types::Integer
+    end 
+  end 
+end 
     class Update < BaseType
       COMMON_FIELDS = %w[update_id message edited_message channel_post 
                         edited_channel_post inline_query chosen_inline_result 
