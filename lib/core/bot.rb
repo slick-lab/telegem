@@ -134,6 +134,30 @@ module Telegem
         end 
       end 
       
+      def set_my_profile_photo(photo, **options)
+        @api.call('setMyProfilePhoto', {
+          photo: photo
+      }.merge(options))
+    end 
+
+    def remove_my_profile_photo
+      @api.call('removeMyProfilePhoto', {})
+    end 
+
+    def get_user_profile_audios(user_id, **options)
+      result = @api.call('getUserProfileAudios', {
+        user_id: user_id
+    }.merge(options))
+    Types::UserProfileAudios.new(result)
+    if result
+    end 
+
+    def create_forum_topic(chat_id, name, **options)
+      @api.call('createForumTopic', {
+        chat_id: chat_id,
+        name: name
+    }.merge(options))
+  end 
       def location(&block)
         on(:message, location: true) do |ctx|
           block.call(ctx) 
