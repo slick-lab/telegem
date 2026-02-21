@@ -85,28 +85,8 @@ module Telegem
             success: false,
             error: "Failed to extract PDF: #{e.message}"
           }
-          rescue LoadError
-            {
-              success: false,
-              error: "PDF extraction requires the 'pdf-reader' gem. Please add it to your Gemfile."
-            } 
-            rescue PDF::Reader::MalformedPDFError => e
-              {
-                success: false,
-                error: "Malformed PDF: #{e.message}"
-              } 
-            rescue PDF::Reader::UnsupportedFeatureError => e
-              {
-                success: false,
-                error: "Unsupported PDF feature: #{e.message}"
-              } 
-            rescue PDF::Reader::EncryptedPDFError => e
-              {
-                success: false,
-                error: "Encrypted PDF: #{e.message}"
-              } 
             ensure 
-              cleanup if @options[:auto_delete]   
+              cleanup if @options[:auto_delete]
         end
       end 
       def extract_json
@@ -196,8 +176,7 @@ module Telegem
       def cleanup
         @temp_file.unlink if @temp_file
         @temp_file = nil
-      end
-    end
-  end
+      end 
+    end 
+  end 
 end
-end 
