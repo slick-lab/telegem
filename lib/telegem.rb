@@ -1,12 +1,12 @@
-# lib/telegem.rb - MAIN ENTRY POINT
+
 require 'logger'
 require 'json'
 
 module Telegem
-  VERSION = "3.2.3".freeze 
+  VERSION = "3.3.0".freeze
 end
 
-# Load core components
+#
 require_relative 'api/client'
 require_relative 'api/types'
 require_relative 'core/bot'
@@ -16,17 +16,18 @@ require_relative 'core/scene'
 require_relative 'session/middleware'
 require_relative 'session/memory_store'
 require_relative 'markup/keyboard'
-# Webhook is loaded lazily when needed
+require_relative 'markup/inline'
+
 require_relative 'plugins/file_extract'
 require_relative 'session/scene_middleware'
 
 module Telegem
-  # Main entry point: Telegem.new(token)
+
   def self.new(token, **options)
     Core::Bot.new(token, **options)
   end
   
-  # Shortcut for creating keyboards
+
   def self.keyboard(&block)
     Markup.keyboard(&block)
   end
@@ -35,28 +36,23 @@ module Telegem
     Markup.inline(&block)
   end
   
-  # Remove keyboard markup
   def self.remove_keyboard(**options)
     Markup.remove(**options)
   end
   
-  # Force reply markup
   def self.force_reply(**options)
     Markup.force_reply(**options)
   end
   
-  # Current version
   def self.version
     VERSION
   end
-  
-  # Quick webhook setup
+
   def self.webhook(bot, **options)
     require_relative 'webhook/server'
     Webhook::Server.setup(bot, **options)
   end
   
-  # Framework information
   def self.info
     <<~INFO
       🤖 Telegem #{VERSION}
@@ -77,7 +73,7 @@ module Telegem
   end
 end
 
-# Optional global shortcut (enabled by env var)
+
 if ENV['TELEGEM_GLOBAL'] == 'true'
   def Telegem(token, **options)
     ::Telegem.new(token, **options)
