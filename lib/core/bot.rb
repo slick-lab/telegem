@@ -1,5 +1,6 @@
+#frozen_string_literal: true
 require 'json'
-
+require 'async'
 module Telegem
   module Core
     class Bot
@@ -148,8 +149,8 @@ module Telegem
       result = @api.call('getUserProfileAudios', {
         user_id: user_id
     }.merge(options))
+    return nil unless result && result['audios']
     Types::UserProfileAudios.new(result)
-    if result
     end 
 
     def create_forum_topic(chat_id, name, **options)
@@ -238,12 +239,9 @@ module Telegem
             
             if updates && updates.any?
               updates.each do |update_data|
-                Async do
                   update = Types::Update.new(update_data)
                   process_update(update)
                 end
-              end
-              
               @offset = updates.last['update_id'] + 1
               @logger.debug("Updated offset to: #{@offset}")
             end
@@ -393,5 +391,4 @@ module Telegem
       end
     end
   end
-end
 end

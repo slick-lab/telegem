@@ -71,7 +71,7 @@ module Telegem
       end 
 
       def caption_entities
-        message&caption_entities || []
+        message&.caption_entities || []
       end 
       
       def caption 
@@ -401,9 +401,6 @@ module Telegem
       def uploading_document(**options)
         send_chat_action('upload_document', **options)
       end
-      def scene 
-        session[:telegem_scene]&.[](:id)
-      end 
       def ask(question, **options)
         scene_data = session[:telegem_scene]
         if scene_data
@@ -439,10 +436,15 @@ module Telegem
         scene&.next_step(self, step_name) 
        end 
       def with_typing(&block)
-        typing_request = typing
-        
+        thread = Thread.new do 
+          while @typing_active
+            typing
+            sleep 5
+          end 
+        end 
         result = block.call
-        
+        @typing_active = false
+        thread.join
         result
       end
       

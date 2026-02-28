@@ -18,26 +18,19 @@ module Telegem
       end
       
       def call(method, params = {})
-        Async do
           make_request(method, params)
-        end.wait
       end
       
       def call!(method, params = {}, &callback)
         return unless callback
-        
-        Async do
           begin
             result = make_request(method, params)
             callback.call(result, nil)
           rescue => error
             callback.call(nil, error)
           end
-        end
       end
-      
       def upload(method, params)
-        Async do
           url = "/bot#{@token}/#{method}"
           
           body = Async::HTTP::Body::Multipart.new
@@ -52,11 +45,10 @@ module Telegem
           
           response = @client.post(url, {}, body)
           handle_response(response)
-        end.wait
+
       end
       
       def download(file_id, destination_path = nil)
-        Async do
           file_info = call('getFile', file_id: file_id)
           return nil unless file_info && file_info['file_path']
           
@@ -76,7 +68,6 @@ module Telegem
           else
             raise NetworkError.new("Download failed: HTTP #{response.status}")
           end
-        end.wait
       end
       
       def get_updates(offset: nil, timeout: 30, limit: 100, allowed_updates: nil)

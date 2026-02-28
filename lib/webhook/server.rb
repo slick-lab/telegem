@@ -120,7 +120,7 @@ module Telegem
         begin
           body = request.body.read
           update_data = JSON.parse(body)
-          Async { process_webhook_update(update_data) }
+           process_webhook_update(update_data) 
           [200, {}, ["OK"]]
         rescue
           [500, {}, ["Internal Server Error"]]

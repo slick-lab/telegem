@@ -2,9 +2,16 @@
 # bin/telegem-ssl
 
 require 'fileutils'
+require 'yaml'
 
 puts "🔐 Telegem SSL Setup"
 puts "=" * 10
+
+if File.exist?('.telegem-ssl')
+  puts "🚫 SSL config already exists at .telegem-ssl"
+  print "Overwrite? (y/n): "
+  exit unless gets.chomp.downcase == 'y'
+end
 
 # Get domain
 domain = ARGV[0]

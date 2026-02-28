@@ -64,36 +64,22 @@ module Telegem
     
     def increment_counters(ctx)
       now = Time.now.to_i
-      
-      
       if @options[:global]
         key = "global"
-        cleanup_counter(:global, key, now)
         @counters[:global].increment(key, 1, ttl: @options[:global][:per])
       end
-      
-      
       if @options[:user] && ctx.from&.id
         key = "user:#{ctx.from.id}"
-        cleanup_counter(:user, key, now)
         @counters[:user].increment(key, 1, ttl: @options[:user][:per])
       end
       
       
       if @options[:chat] && ctx.chat&.id
         key = "chat:#{ctx.chat.id}"
-        cleanup_counter(:chat, key, now)
         @counters[:chat].increment(key, 1, ttl: @options[:chat][:per])
       end
     end
-    
-    def cleanup_counter(type, key, now)
-      expires = @counters[type].get_ttl(key) || now
-      @counters[type].delete(key) if now > expires 
-    end
-    
     def rate_limit_response(ctx)
-      
       ctx.reply("⏳ Please wait a moment before sending another request.") rescue nil
       nil
     end

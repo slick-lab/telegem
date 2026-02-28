@@ -124,7 +124,7 @@ module Telegem
       def process_response(ctx, scene_data)
 
         current_step_name = scene_data[:step]
-        scene_data[:data][current_step_name] = ctx.message.text
+        scene_data[:data][current_step_name] = ctx.message
         
   
         scene_data[:waiting_for_response] = false

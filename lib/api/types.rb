@@ -294,6 +294,42 @@ module Telegem
             u.is_a?(User) ? u : User.new(u)
           end
         end
+        
+        wrap_media_objects
+      end
+      
+      def wrap_media_objects
+        # Media files
+        @_raw_data['document'] = BaseType.new(@_raw_data['document']) if @_raw_data['document'] && !@_raw_data['document'].is_a?(BaseType)
+        @_raw_data['audio'] = BaseType.new(@_raw_data['audio']) if @_raw_data['audio'] && !@_raw_data['audio'].is_a?(BaseType)
+        @_raw_data['video'] = BaseType.new(@_raw_data['video']) if @_raw_data['video'] && !@_raw_data['video'].is_a?(BaseType)
+        @_raw_data['voice'] = BaseType.new(@_raw_data['voice']) if @_raw_data['voice'] && !@_raw_data['voice'].is_a?(BaseType)
+        @_raw_data['video_note'] = BaseType.new(@_raw_data['video_note']) if @_raw_data['video_note'] && !@_raw_data['video_note'].is_a?(BaseType)
+        @_raw_data['sticker'] = BaseType.new(@_raw_data['sticker']) if @_raw_data['sticker'] && !@_raw_data['sticker'].is_a?(BaseType)
+        
+        # Photo array
+        if @_raw_data['photo'] && @_raw_data['photo'].is_a?(Array)
+          @_raw_data['photo'] = @_raw_data['photo'].map do |p|
+            p.is_a?(BaseType) ? p : BaseType.new(p)
+          end
+        end
+        
+        # Contact, location, venue
+        @_raw_data['contact'] = BaseType.new(@_raw_data['contact']) if @_raw_data['contact'] && !@_raw_data['contact'].is_a?(BaseType)
+        @_raw_data['location'] = BaseType.new(@_raw_data['location']) if @_raw_data['location'] && !@_raw_data['location'].is_a?(BaseType)
+        @_raw_data['venue'] = BaseType.new(@_raw_data['venue']) if @_raw_data['venue'] && !@_raw_data['venue'].is_a?(BaseType)
+        
+        # Payment & other
+        @_raw_data['invoice'] = BaseType.new(@_raw_data['invoice']) if @_raw_data['invoice'] && !@_raw_data['invoice'].is_a?(BaseType)
+        @_raw_data['successful_payment'] = BaseType.new(@_raw_data['successful_payment']) if @_raw_data['successful_payment'] && !@_raw_data['successful_payment'].is_a?(BaseType)
+        @_raw_data['reply_markup'] = BaseType.new(@_raw_data['reply_markup']) if @_raw_data['reply_markup'] && !@_raw_data['reply_markup'].is_a?(BaseType)
+        
+        # Chat photo array
+        if @_raw_data['new_chat_photo'] && @_raw_data['new_chat_photo'].is_a?(Array)
+          @_raw_data['new_chat_photo'] = @_raw_data['new_chat_photo'].map do |p|
+            p.is_a?(BaseType) ? p : BaseType.new(p)
+          end
+        end
       end
     end
     
