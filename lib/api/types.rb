@@ -543,19 +543,45 @@ module Telegem
     class ChatPhoto < BaseType; end
     class ChatInviteLink < BaseType; end
 
+    # status-specific chat member objects. they inherit from ChatMember
     class ChatMember < BaseType; end
+    class ChatMemberOwner < ChatMember; end
+    class ChatMemberAdministrator < ChatMember; end
+    class ChatMemberMember < ChatMember; end
+    class ChatMemberRestricted < ChatMember; end
+    class ChatMemberLeft < ChatMember; end
+    class ChatMemberBanned < ChatMember; end
+
+    class ChatAdministratorRights < BaseType; end
 
     class ChatMemberUpdated < BaseType
       def initialize(data)
         super(data)
         wrap('chat', Chat)
         wrap('from', User)
-        wrap('old_chat_member', ChatMember)
-        wrap('new_chat_member', ChatMember)
+        wrap_member('old_chat_member')
+        wrap_member('new_chat_member')
         wrap('invite_link', ChatInviteLink)
         if @_raw_data['date'] && !@_raw_data['date'].is_a?(Time)
           @_raw_data['date'] = Time.at(@_raw_data['date'])
         end
+      end
+
+      private
+
+      def wrap_member(key)
+        return unless @_raw_data[key]
+        status = @_raw_data[key]['status']
+        klass = case status
+                when 'creator' then ChatMemberOwner
+                when 'administrator' then ChatMemberAdministrator
+                when 'member' then ChatMemberMember
+                when 'restricted' then ChatMemberRestricted
+                when 'left' then ChatMemberLeft
+                when 'kicked' then ChatMemberBanned
+                else ChatMember
+                end
+        @_raw_data[key] = klass.new(@_raw_data[key])
       end
     end
 
