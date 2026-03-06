@@ -62,6 +62,21 @@ module Telegem
         @_accessors_defined[name] = true
       end
       
+      # helpers for converting nested objects
+      def wrap(key, klass)
+        if @_raw_data[key] && !@_raw_data[key].is_a?(klass)
+          @_raw_data[key] = klass.new(@_raw_data[key])
+        end
+      end
+      
+      def wrap_array(key, klass)
+        if @_raw_data[key] && @_raw_data[key].is_a?(Array)
+          @_raw_data[key] = @_raw_data[key].map do |v|
+            v.is_a?(klass) ? v : klass.new(v)
+          end
+        end
+      end
+      
       def snake_to_camel(str)
         str.gsub(/_([a-z])/) { $1.upcase }
       end
@@ -250,84 +265,104 @@ module Telegem
       private
       
       def convert_complex_fields
-        if @_raw_data['date'] && !@_raw_data['date'].is_a?(Time)
-          @_raw_data['date'] = Time.at(@_raw_data['date'])
-        end
-        
-        if @_raw_data['edit_date'] && !@_raw_data['edit_date'].is_a?(Time)
-          @_raw_data['edit_date'] = Time.at(@_raw_data['edit_date'])
-        end
-        
-        if @_raw_data['forward_date'] && !@_raw_data['forward_date'].is_a?(Time)
-          @_raw_data['forward_date'] = Time.at(@_raw_data['forward_date'])
-        end
-        
-        @_raw_data['from'] = User.new(@_raw_data['from']) if @_raw_data['from'] && !@_raw_data['from'].is_a?(User)
-        @_raw_data['chat'] = Chat.new(@_raw_data['chat']) if @_raw_data['chat'] && !@_raw_data['chat'].is_a?(Chat)
-        @_raw_data['via_bot'] = User.new(@_raw_data['via_bot']) if @_raw_data['via_bot'] && !@_raw_data['via_bot'].is_a?(User)
-        @_raw_data['forward_from'] = User.new(@_raw_data['forward_from']) if @_raw_data['forward_from'] && !@_raw_data['forward_from'].is_a?(User)
-        @_raw_data['forward_from_chat'] = Chat.new(@_raw_data['forward_from_chat']) if @_raw_data['forward_from_chat'] && !@_raw_data['forward_from_chat'].is_a?(Chat)
-        @_raw_data['left_chat_member'] = User.new(@_raw_data['left_chat_member']) if @_raw_data['left_chat_member'] && !@_raw_data['left_chat_member'].is_a?(User)
-        
-        if @_raw_data['entities'] && @_raw_data['entities'].is_a?(Array)
-          @_raw_data['entities'] = @_raw_data['entities'].map do |e|
-            e.is_a?(MessageEntity) ? e : MessageEntity.new(e)
-          end
-        end
-        
-        if @_raw_data['caption_entities'] && @_raw_data['caption_entities'].is_a?(Array)
-          @_raw_data['caption_entities'] = @_raw_data['caption_entities'].map do |e|
-            e.is_a?(MessageEntity) ? e : MessageEntity.new(e)
-          end
-        end
-        
-        if @_raw_data['reply_to_message'] && !@_raw_data['reply_to_message'].is_a?(Message)
-          @_raw_data['reply_to_message'] = Message.new(@_raw_data['reply_to_message'])
-        end
-        
-        if @_raw_data['pinned_message'] && !@_raw_data['pinned_message'].is_a?(Message)
-          @_raw_data['pinned_message'] = Message.new(@_raw_data['pinned_message'])
-        end
-        
-        if @_raw_data['new_chat_members'] && @_raw_data['new_chat_members'].is_a?(Array)
-          @_raw_data['new_chat_members'] = @_raw_data['new_chat_members'].map do |u|
-            u.is_a?(User) ? u : User.new(u)
-          end
-        end
-        
+        # time conversions
+        @_raw_data['date'] = Time.at(@_raw_data['date']) if @_raw_data['date'] && !@_raw_data['date'].is_a?(Time)
+        @_raw_data['edit_date'] = Time.at(@_raw_data['edit_date']) if @_raw_data['edit_date'] && !@_raw_data['edit_date'].is_a?(Time)
+        @_raw_data['forward_date'] = Time.at(@_raw_data['forward_date']) if @_raw_data['forward_date'] && !@_raw_data['forward_date'].is_a?(Time)
+
+        # basic object wrappers
+        wrap('from', User)
+        wrap('chat', Chat)
+        wrap('via_bot', User)
+        wrap('forward_from', User)
+        wrap('forward_from_chat', Chat)
+        wrap('left_chat_member', User)
+
+        wrap_array('entities', MessageEntity)
+        wrap_array('caption_entities', MessageEntity)
+
+        wrap('reply_to_message', Message)
+        wrap('pinned_message', Message)
+        wrap_array('new_chat_members', User)
+
+        # media and other nested types
+        wrap('contact', Contact)
+        wrap('location', Location)
+        wrap('venue', Venue)
+        wrap('dice', Dice)
+        wrap('poll', Poll)
+        wrap('proximity_alert_triggered', ProximityAlertTriggered)
+        wrap('web_app_data', WebAppData)
+
+        wrap('animation', Animation)
+        wrap('audio', Audio)
+        wrap('document', Document)
+        wrap('video', Video)
+        wrap('voice', Voice)
+        wrap('video_note', VideoNote)
+        wrap('sticker', Sticker)
+
+        wrap('invoice', Invoice)
+        wrap('successful_payment', SuccessfulPayment)
+        wrap('reply_markup', BaseType)
+
+        wrap('passport_data', PassportData)
+
+        wrap('video_chat_scheduled', VideoChatScheduled)
+        wrap('video_chat_started', VideoChatStarted)
+        wrap('video_chat_ended', VideoChatEnded)
+        wrap('video_chat_participants_invited', VideoChatParticipantsInvited)
+        wrap('video_chat_location', VideoChatLocation)
+
+        # new message event objects introduced in later API versions
+        wrap('message_auto_delete_timer_changed', MessageAutoDeleteTimerChanged)
+        wrap('forum_topic_created', ForumTopicCreated)
+        wrap('forum_topic_edited', ForumTopicEdited)
+        wrap('forum_topic_closed', ForumTopicClosed)
+        wrap('forum_topic_reopened', ForumTopicReopened)
+        wrap('general_forum_topic_hidden', GeneralForumTopicHidden)
+        wrap('general_forum_topic_unhidden', GeneralForumTopicUnhidden)
+        wrap('write_access_allowed', WriteAccessAllowed)
+
+        # arrays of sizes and photos
+        wrap_array('photo', PhotoSize)
+        wrap_array('new_chat_photo', PhotoSize)
+
+        # fall back to original media wrapper for backward compatibility
         wrap_media_objects
       end
       
       def wrap_media_objects
-        # Media files
-        @_raw_data['document'] = BaseType.new(@_raw_data['document']) if @_raw_data['document'] && !@_raw_data['document'].is_a?(BaseType)
-        @_raw_data['audio'] = BaseType.new(@_raw_data['audio']) if @_raw_data['audio'] && !@_raw_data['audio'].is_a?(BaseType)
-        @_raw_data['video'] = BaseType.new(@_raw_data['video']) if @_raw_data['video'] && !@_raw_data['video'].is_a?(BaseType)
-        @_raw_data['voice'] = BaseType.new(@_raw_data['voice']) if @_raw_data['voice'] && !@_raw_data['voice'].is_a?(BaseType)
-        @_raw_data['video_note'] = BaseType.new(@_raw_data['video_note']) if @_raw_data['video_note'] && !@_raw_data['video_note'].is_a?(BaseType)
-        @_raw_data['sticker'] = BaseType.new(@_raw_data['sticker']) if @_raw_data['sticker'] && !@_raw_data['sticker'].is_a?(BaseType)
-        
+        # Media files (fall‑back to generic types if no specific class defined)
+        @_raw_data['document'] = Document.new(@_raw_data['document']) if @_raw_data['document'] && !@_raw_data['document'].is_a?(Document)
+        @_raw_data['animation'] = Animation.new(@_raw_data['animation']) if @_raw_data['animation'] && !@_raw_data['animation'].is_a?(Animation)
+        @_raw_data['audio'] = Audio.new(@_raw_data['audio']) if @_raw_data['audio'] && !@_raw_data['audio'].is_a?(Audio)
+        @_raw_data['video'] = Video.new(@_raw_data['video']) if @_raw_data['video'] && !@_raw_data['video'].is_a?(Video)
+        @_raw_data['voice'] = Voice.new(@_raw_data['voice']) if @_raw_data['voice'] && !@_raw_data['voice'].is_a?(Voice)
+        @_raw_data['video_note'] = VideoNote.new(@_raw_data['video_note']) if @_raw_data['video_note'] && !@_raw_data['video_note'].is_a?(VideoNote)
+        @_raw_data['sticker'] = Sticker.new(@_raw_data['sticker']) if @_raw_data['sticker'] && !@_raw_data['sticker'].is_a?(Sticker)
+
         # Photo array
         if @_raw_data['photo'] && @_raw_data['photo'].is_a?(Array)
           @_raw_data['photo'] = @_raw_data['photo'].map do |p|
-            p.is_a?(BaseType) ? p : BaseType.new(p)
+            p.is_a?(PhotoSize) ? p : PhotoSize.new(p)
           end
         end
-        
+
         # Contact, location, venue
-        @_raw_data['contact'] = BaseType.new(@_raw_data['contact']) if @_raw_data['contact'] && !@_raw_data['contact'].is_a?(BaseType)
-        @_raw_data['location'] = BaseType.new(@_raw_data['location']) if @_raw_data['location'] && !@_raw_data['location'].is_a?(BaseType)
-        @_raw_data['venue'] = BaseType.new(@_raw_data['venue']) if @_raw_data['venue'] && !@_raw_data['venue'].is_a?(BaseType)
-        
+        @_raw_data['contact'] = Contact.new(@_raw_data['contact']) if @_raw_data['contact'] && !@_raw_data['contact'].is_a?(Contact)
+        @_raw_data['location'] = Location.new(@_raw_data['location']) if @_raw_data['location'] && !@_raw_data['location'].is_a?(Location)
+        @_raw_data['venue'] = Venue.new(@_raw_data['venue']) if @_raw_data['venue'] && !@_raw_data['venue'].is_a?(Venue)
+
         # Payment & other
-        @_raw_data['invoice'] = BaseType.new(@_raw_data['invoice']) if @_raw_data['invoice'] && !@_raw_data['invoice'].is_a?(BaseType)
-        @_raw_data['successful_payment'] = BaseType.new(@_raw_data['successful_payment']) if @_raw_data['successful_payment'] && !@_raw_data['successful_payment'].is_a?(BaseType)
+        @_raw_data['invoice'] = Invoice.new(@_raw_data['invoice']) if @_raw_data['invoice'] && !@_raw_data['invoice'].is_a?(Invoice)
+        @_raw_data['successful_payment'] = SuccessfulPayment.new(@_raw_data['successful_payment']) if @_raw_data['successful_payment'] && !@_raw_data['successful_payment'].is_a?(SuccessfulPayment)
         @_raw_data['reply_markup'] = BaseType.new(@_raw_data['reply_markup']) if @_raw_data['reply_markup'] && !@_raw_data['reply_markup'].is_a?(BaseType)
-        
+
         # Chat photo array
         if @_raw_data['new_chat_photo'] && @_raw_data['new_chat_photo'].is_a?(Array)
           @_raw_data['new_chat_photo'] = @_raw_data['new_chat_photo'].map do |p|
-            p.is_a?(BaseType) ? p : BaseType.new(p)
+            p.is_a?(PhotoSize) ? p : PhotoSize.new(p)
           end
         end
       end
@@ -428,15 +463,218 @@ module Telegem
       private
       
       def convert_update_objects
-        @_raw_data['message'] = Message.new(@_raw_data['message']) if @_raw_data['message'] && !@_raw_data['message'].is_a?(Message)
-        @_raw_data['edited_message'] = Message.new(@_raw_data['edited_message']) if @_raw_data['edited_message'] && !@_raw_data['edited_message'].is_a?(Message)
-        @_raw_data['channel_post'] = Message.new(@_raw_data['channel_post']) if @_raw_data['channel_post'] && !@_raw_data['channel_post'].is_a?(Message)
-        @_raw_data['edited_channel_post'] = Message.new(@_raw_data['edited_channel_post']) if @_raw_data['edited_channel_post'] && !@_raw_data['edited_channel_post'].is_a?(Message)
-        
-        if @_raw_data['callback_query'] && !@_raw_data['callback_query'].is_a?(CallbackQuery)
-          @_raw_data['callback_query'] = CallbackQuery.new(@_raw_data['callback_query'])
+        wrap('message', Message)
+        wrap('edited_message', Message)
+        wrap('channel_post', Message)
+        wrap('edited_channel_post', Message)
+
+        wrap('inline_query', InlineQuery)
+        wrap('chosen_inline_result', ChosenInlineResult)
+        wrap('callback_query', CallbackQuery)
+        wrap('shipping_query', ShippingQuery)
+        wrap('pre_checkout_query', PreCheckoutQuery)
+        wrap('poll', Poll)
+        wrap('poll_answer', PollAnswer)
+        wrap('my_chat_member', ChatMemberUpdated)
+        wrap('chat_member', ChatMemberUpdated)
+        wrap('chat_join_request', ChatJoinRequest)
+        wrap('forum_topic_created', ForumTopicCreated)
+        wrap('forum_topic_edited', ForumTopicEdited)
+        wrap('forum_topic_closed', ForumTopicClosed)
+        wrap('forum_topic_reopened', ForumTopicReopened)
+        wrap('general_forum_topic_hidden', GeneralForumTopicHidden)
+        wrap('general_forum_topic_unhidden', GeneralForumTopicUnhidden)
+        wrap('write_access_allowed', WriteAccessAllowed)
+      end
+    end
+
+    # additional types returned by various methods / updates
+    class PhotoSize < BaseType; end
+    class Audio < BaseType; end
+    class Document < BaseType; end
+    class Video < BaseType; end
+    class Voice < BaseType; end
+    class VideoNote < BaseType; end
+    class Animation < BaseType; end
+    class Sticker < BaseType; end
+    class Contact < BaseType; end
+    class Dice < BaseType; end
+
+    class Location < BaseType; end
+    class Venue < BaseType; end
+    class ProximityAlertTriggered < BaseType; end
+    class WebAppData < BaseType; end
+    class PassportData < BaseType; end
+
+    class Invoice < BaseType; end
+    class SuccessfulPayment < BaseType; end
+    class ShippingAddress < BaseType; end
+    class OrderInfo < BaseType; end
+
+    class ShippingQuery < BaseType
+      def initialize(data)
+        super(data)
+        wrap('from', User)
+        wrap('shipping_address', ShippingAddress)
+      end
+    end
+
+    class PreCheckoutQuery < BaseType
+      def initialize(data)
+        super(data)
+        wrap('from', User)
+        wrap('shipping_address', ShippingAddress)
+        wrap('order_info', OrderInfo)
+      end
+    end
+
+    class PollOption < BaseType; end
+    class PollAnswer < BaseType; end
+
+    class Poll < BaseType
+      def initialize(data)
+        super(data)
+        wrap_array('options', PollOption)
+        wrap_array('explanation_entities', MessageEntity)
+      end
+    end
+
+    class ChatPermissions < BaseType; end
+    class ChatPhoto < BaseType; end
+    class ChatInviteLink < BaseType; end
+
+    # status-specific chat member objects. they inherit from ChatMember
+    class ChatMember < BaseType; end
+    class ChatMemberOwner < ChatMember; end
+    class ChatMemberAdministrator < ChatMember; end
+    class ChatMemberMember < ChatMember; end
+    class ChatMemberRestricted < ChatMember; end
+    class ChatMemberLeft < ChatMember; end
+    class ChatMemberBanned < ChatMember; end
+
+    class ChatAdministratorRights < BaseType; end
+
+    class ChatMemberUpdated < BaseType
+      def initialize(data)
+        super(data)
+        wrap('chat', Chat)
+        wrap('from', User)
+        wrap_member('old_chat_member')
+        wrap_member('new_chat_member')
+        wrap('invite_link', ChatInviteLink)
+        if @_raw_data['date'] && !@_raw_data['date'].is_a?(Time)
+          @_raw_data['date'] = Time.at(@_raw_data['date'])
+        end
+      end
+
+      private
+
+      def wrap_member(key)
+        return unless @_raw_data[key]
+        status = @_raw_data[key]['status']
+        klass = case status
+                when 'creator' then ChatMemberOwner
+                when 'administrator' then ChatMemberAdministrator
+                when 'member' then ChatMemberMember
+                when 'restricted' then ChatMemberRestricted
+                when 'left' then ChatMemberLeft
+                when 'kicked' then ChatMemberBanned
+                else ChatMember
+                end
+        @_raw_data[key] = klass.new(@_raw_data[key])
+      end
+    end
+
+    class ChatJoinRequest < BaseType
+      def initialize(data)
+        super(data)
+        wrap('chat', Chat)
+        wrap('from', User)
+        wrap('invite_link', ChatInviteLink)
+        if @_raw_data['date'] && !@_raw_data['date'].is_a?(Time)
+          @_raw_data['date'] = Time.at(@_raw_data['date'])
         end
       end
     end
+
+    class InlineQuery < BaseType
+      def initialize(data)
+        super(data)
+        wrap('from', User)
+        wrap('location', Location)
+      end
+    end
+
+    class ChosenInlineResult < BaseType
+      def initialize(data)
+        super(data)
+        wrap('from', User)
+        wrap('location', Location)
+      end
+    end
+
+    class InlineQueryResult < BaseType; end
+    class InlineQueryResultArticle < InlineQueryResult; end
+    class InlineQueryResultPhoto < InlineQueryResult; end
+    class InlineQueryResultGif < InlineQueryResult; end
+    class InlineQueryResultMpeg4Gif < InlineQueryResult; end
+    class InlineQueryResultVideo < InlineQueryResult; end
+    class InlineQueryResultAudio < InlineQueryResult; end
+    class InlineQueryResultVoice < InlineQueryResult; end
+    class InlineQueryResultDocument < InlineQueryResult; end
+    class InlineQueryResultLocation < InlineQueryResult; end
+    class InlineQueryResultVenue < InlineQueryResult; end
+    class InlineQueryResultContact < InlineQueryResult; end
+    class InlineQueryResultGame < InlineQueryResult; end
+    class InlineQueryResultSticker < InlineQueryResult; end
+    class InlineQueryResultCachedPhoto < InlineQueryResult; end
+    class InlineQueryResultCachedGif < InlineQueryResult; end
+    class InlineQueryResultCachedMpeg4Gif < InlineQueryResult; end
+    class InlineQueryResultCachedSticker < InlineQueryResult; end
+    class InlineQueryResultCachedDocument < InlineQueryResult; end
+    class InlineQueryResultCachedVideo < InlineQueryResult; end
+    class InlineQueryResultCachedAudio < InlineQueryResult; end
+    class InlineQueryResultCachedVoice < InlineQueryResult; end
+
+    class UserProfilePhotos < BaseType
+      def initialize(data)
+        super(data)
+        wrap_array('photos', PhotoSize)
+      end
+    end
+
+    class UserProfileAudios < BaseType
+      def initialize(data)
+        super(data)
+        wrap_array('audios', Audio)
+      end
+    end
+
+    # generic utility objects returned by the API
+    class File < BaseType; end
+    class ResponseParameters < BaseType; end
+    class MaskPosition < BaseType; end
+    class StickerSet < BaseType; end
+
+    # new message event payloads (each a simple wrapper)
+    class MessageAutoDeleteTimerChanged < BaseType; end
+    class ForumTopicCreated < BaseType; end
+    class ForumTopicEdited < BaseType; end
+    class ForumTopicClosed < BaseType; end
+    class ForumTopicReopened < BaseType; end
+    class GeneralForumTopicHidden < BaseType; end
+    class GeneralForumTopicUnhidden < BaseType; end
+    class WriteAccessAllowed < BaseType; end
+
+    class BotCommand < BaseType; end
+    class BotCommandScope < BaseType; end
+    class WebhookInfo < BaseType; end
+
+    class VideoChatScheduled < BaseType; end
+    class VideoChatStarted < BaseType; end
+    class VideoChatEnded < BaseType; end
+    class VideoChatParticipantsInvited < BaseType; end
+    class VideoChatLocation < BaseType; end
+
   end
 end
