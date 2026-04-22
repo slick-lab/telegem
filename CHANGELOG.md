@@ -1,6 +1,12 @@
 Telegem Changelog
 
-v3.1.1 (current)
+v3.3.1(lastest) 
+> Features 
+- improved memeorystore to include diskbackup
+- added 'telegem-init' cli 
+
+
+v3.1.1 
 
 🚀 New Features
 
