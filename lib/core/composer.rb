@@ -40,7 +40,7 @@ module Telegem
             # Call the middleware with next in chain
             middleware_instance.call(context, next_middleware)
           else
-            raise "Invalid middleware: #{middleware.class}"
+            raise "Invalid middleware: #{middleware.inspect} does not respond to :call"
           end
         end
       end
