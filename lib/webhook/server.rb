@@ -116,7 +116,9 @@ module Telegem
 
       def handle_webhook_request(request)
         return [405, {}, ["Method Not Allowed"]] unless request.post?
-        return [403, {}, ["Forbidden"]] unless request.headers['X-TELEGRAM-BOT-API-SECRET-TOKEN'] == @secret_token
+        received = request.headers['X-Telegram-Bot-Api-Secret-Token'] ||
+           request.headers['x-telegram-bot-api-secret-token']
+        return [403, {}, ["Forbidden"]] unless received  == @secret_token
 
         begin
           body = request.body.read
