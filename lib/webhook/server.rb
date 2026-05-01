@@ -166,12 +166,7 @@ module Telegem
 
       def set_webhook(**options)
         url = webhook_url
-<<<<<<< main
-        params = { url: url, secret_token: @secret_token }.merge(options)
-        @bot.set_webhook(**params)
-=======
         @bot.set_webhook(url, **options)
->>>>>>> main
         @logger.info("Webhook set to: #{url}")
         url
       end
