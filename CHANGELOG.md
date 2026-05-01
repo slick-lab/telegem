@@ -1,6 +1,19 @@
 # Telegem Changelog
 
-## v3.3.1(lastest) 
+
+## v3.3.2-rc.1
+
+### Fixed
+- Webhook `set_webhook` now correctly passes URL as positional argument
+- Removed unsafe thread usage in `Context#with_typing` (async-safe now)
+- Added automatic retry with exponential backoff in API client
+- Improved `telegem-ssl` to detect dnf/yum on Fedora/RHEL
+
+### Changed
+- No breaking changes. Safe upgrade from v3.3.1.
+
+
+## v3.3.1
 ### Features 
 - improved memeorystore to include diskbackup
 - added 'telegem-init' cli 
