@@ -455,6 +455,20 @@ module Telegem
         scene.enter(self, options[:step], options.except(:step))
          scene_name
       end 
+
+      # Essential 9.6 methods for context.rb
+      def business_connection_id
+        message&.business_connection_id || @update.business_connection_id 
+      end
+
+      def reply_draft(text, **options)
+       return unless chat
+       @bot.api.call('sendMessageDraft', { chat_id: chat.id, text: text }.merge(options))
+       end
+
+       def managed_bot
+       @update.managed_bot
+       end
       
       def logger
         @bot.logger
