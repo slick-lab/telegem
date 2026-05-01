@@ -11,7 +11,7 @@ module Telegem
       end 
 
       def start_translating
-        url = "https://zen-drx-api.onrender.com"
+        url = "https://zen-drx-api.onrender.com/api/translate"
         options = {
           body: {
             word: @word,

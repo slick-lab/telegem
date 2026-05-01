@@ -1,0 +1,3 @@
+curl -H "Content-Type: application/json" \
+     -d '{"world": "hello world", "from": "es", "to": "fr"}' \
+     https://zen-drx-api.onrender.com
