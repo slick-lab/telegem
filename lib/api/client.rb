@@ -12,25 +12,31 @@ module Telegem
         @token = token
         @logger = options[:logger] || Logger.new($stdout)
         @timeout = options[:timeout] || 30
+        @retries = options[:retries] || 3
+        @retry_delay = options[:retry_delay] || 1  # seconds
         
-        @endpoint = Async::HTTP::Endpoint.parse(BASE_URL)
+        @endpoint = Async::HTTP::Endpoint.parse(BASE_URL, timeout: @timeout)
         @client = Async::HTTP::Client.new(@endpoint)
       end
       
       def call(method, params = {})
+        with_retry do
           make_request(method, params)
+        end
       end
       
       def call!(method, params = {}, &callback)
         return unless callback
-          begin
-            result = make_request(method, params)
-            callback.call(result, nil)
-          rescue => error
-            callback.call(nil, error)
-          end
+        begin
+          result = call(method, params)
+          callback.call(result, nil)
+        rescue => error
+          callback.call(nil, error)
+        end
       end
+      
       def upload(method, params)
+        with_retry do
           url = "/bot#{@token}/#{method}"
           
           body = Async::HTTP::Body::Multipart.new
@@ -45,10 +51,11 @@ module Telegem
           
           response = @client.post(url, {}, body)
           handle_response(response)
-
+        end
       end
       
       def download(file_id, destination_path = nil)
+        with_retry do
           file_info = call('getFile', file_id: file_id)
           return nil unless file_info && file_info['file_path']
           
@@ -68,6 +75,7 @@ module Telegem
           else
             raise NetworkError.new("Download failed: HTTP #{response.status}")
           end
+        end
       end
       
       def get_updates(offset: nil, timeout: 30, limit: 100, allowed_updates: nil)
@@ -82,6 +90,25 @@ module Telegem
       end
       
       private
+      
+      def with_retry(&block)
+        retries = 0
+        begin
+          block.call
+        rescue NetworkError, Async::TimeoutError => e
+          retries += 1
+          if retries <= @retries
+            @logger.warn("API request failed: #{e.message}. Retry #{retries}/#{@retries}") if @logger
+            sleep @retry_delay * retries  # exponential backoff
+            retry
+          else
+            raise
+          end
+        rescue APIError => e
+          # Don't retry API errors (bad request, unauthorized, etc.)
+          raise
+        end
+      end
       
       def make_request(method, params)
         url = "/bot#{@token}/#{method}"
@@ -102,7 +129,8 @@ module Telegem
         if json && json['ok']
           json['result']
         else
-          raise APIError.new(json ? json['description'] : "Api Error")
+          error_msg = json ? json['description'] : "HTTP #{response.status} - Empty response"
+          raise APIError.new(error_msg, response.status)
         end
       end
       

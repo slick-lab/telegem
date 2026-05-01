@@ -436,16 +436,8 @@ module Telegem
         scene&.next_step(self, step_name) 
        end 
       def with_typing(&block)
-        thread = Thread.new do 
-          while @typing_active
-            typing
-            sleep 5
-          end 
-        end 
-        result = block.call
-        @typing_active = false
-        thread.join
-        result
+        typing
+        block.call
       end
       
       def command?

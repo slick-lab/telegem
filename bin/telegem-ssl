@@ -4,48 +4,94 @@
 require 'fileutils'
 require 'yaml'
 
-puts "🔐 Telegem SSL Setup"
-puts "=" * 10
+puts "Telegem SSL Setup"
+puts "=" * 40
 
+# Check for existing config
 if File.exist?('.telegem-ssl')
-  puts "🚫 SSL config already exists at .telegem-ssl"
+  puts "SSL config already exists at .telegem-ssl"
   print "Overwrite? (y/n): "
-  exit unless gets.chomp.downcase == 'y'
+  response = gets.chomp.downcase
+  unless response == 'y'
+    puts "Setup cancelled."
+    exit 1
+  end
 end
 
 # Get domain
 domain = ARGV[0]
 unless domain
-  print "🌐 Enter domain (e.g., bot.example.com): "
+  print "Enter domain (e.g., bot.example.com): "
   domain = gets.chomp
 end
 
-# Get email  
+# Get email
 email = ARGV[1] || "admin@#{domain}"
 
-# Check certbot
-unless system("which certbot > /dev/null")
-  puts "📦 Installing certbot..."
-  system("sudo apt update && sudo apt install -y certbot")
+# Detect package manager and install certbot
+def install_certbot
+  return true if system("command -v certbot > /dev/null 2>&1")
+  
+  puts "Installing certbot..."
+  
+  case
+  when system("command -v apt > /dev/null 2>&1")
+    system("sudo apt update && sudo apt install -y certbot")
+  when system("command -v dnf > /dev/null 2>&1")
+    system("sudo dnf install -y certbot")
+  when system("command -v yum > /dev/null 2>&1")
+    system("sudo yum install -y certbot")
+  when system("command -v brew > /dev/null 2>&1")
+    system("brew install certbot")
+  else
+    puts "Could not detect package manager. Please install certbot manually:"
+    puts "  https://certbot.eff.org/instructions"
+    return false
+  end
+  
+  system("command -v certbot > /dev/null 2>&1")
+end
+
+unless install_certbot
+  puts "Failed to install certbot. Exiting."
+  exit 1
 end
 
 # Generate certificate
-puts "\n📄 Getting SSL certificate..."
+puts "Getting SSL certificate..."
+
+# Try standalone mode first, fall back to webroot
 cert_cmd = "sudo certbot certonly --standalone -d #{domain} --email #{email} --agree-tos --non-interactive"
 puts "Running: #{cert_cmd}"
 
-if system(cert_cmd)
-  # Create config
-  config = {
-    domain: domain,
-    cert_path: "/etc/letsencrypt/live/#{domain}/fullchain.pem",
-    key_path: "/etc/letsencrypt/live/#{domain}/privkey.pem"
-  }
+unless system(cert_cmd)
+  puts "Standalone mode failed. Trying webroot mode..."
+  print "Enter webroot path (e.g., /var/www/html): "
+  webroot = gets.chomp
   
-  File.write(".telegem-ssl", config.to_yaml)
-  puts "✅ SSL configured! Certificate valid for 90 days."
-  puts "📁 Config saved to .telegem-ssl"
-  puts "\n🚀 Start your bot: ruby bot.rb"
-else
-  puts "❌ Failed to get certificate. Check domain and try again."
+  cert_cmd = "sudo certbot certonly --webroot -w #{webroot} -d #{domain} --email #{email} --agree-tos --non-interactive"
+  puts "Running: #{cert_cmd}"
+  
+  unless system(cert_cmd)
+    puts "Failed to get certificate. Check domain and try again."
+    exit 1
+  end
 end
+
+# Create config
+config = {
+  domain: domain,
+  cert_path: "/etc/letsencrypt/live/#{domain}/fullchain.pem",
+  key_path: "/etc/letsencrypt/live/#{domain}/privkey.pem"
+}
+
+File.write(".telegem-ssl", config.to_yaml)
+puts "SSL configured. Certificate valid for 90 days."
+puts "Config saved to .telegem-ssl"
+
+# Auto-renewal instructions
+puts "\nAuto-renewal setup (recommended):"
+puts "  Add this to crontab (crontab -e):"
+puts "  0 0 1 * * certbot renew --quiet && systemctl reload your-bot"
+
+puts "\nStart your bot: ruby bot.rb"
