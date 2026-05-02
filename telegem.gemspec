@@ -10,13 +10,13 @@ Gem::Specification.new do |spec|
   spec.summary       = "Modern, fast Telegram Bot Framework for Ruby"
   spec.description   = <<~DESC
     Telegem is a modern Telegram Bot Framework for Ruby inspired by Telegraf.js.
-    Built with async-first design using HTTPX, featuring scenes, middleware,
+    Built with async-first design using async-http, featuring scenes, middleware,
     and a clean DSL. Perfect for building scalable Telegram bots.
   DESC
   
   spec.homepage      = "https://github.com/slick-lab/telegem"
   spec.license       = "MIT"
-  spec.required_ruby_version = ">= 3.1.0"
+  spec.required_ruby_version = ">= 3.4.0"
   
   # Files to include
   spec.files = Dir.chdir(__dir__) do
@@ -26,11 +26,10 @@ Gem::Specification.new do |spec|
   end
   
   spec.bindir        = "bin"
-  spec.executables   = ["telegem-ssl", "telegem-init"]
+  spec.executables   = ["telegem-ssl"]
   spec.require_paths = ["lib"]
   
   # Dependencies
-  spec.add_dependency "concurrent-ruby", "~> 1.3.6"
   spec.add_dependency "securerandom", "~> 0.1"
   spec.add_dependency "async", "~> 2.35.2"
   spec.add_dependency "async-http", "~> 0.92.1"
@@ -47,7 +46,7 @@ Gem::Specification.new do |spec|
     "source_code_uri" => spec.homepage,
     "changelog_uri" => "#{spec.homepage}/-/blob/main/CHANGELOG.md",
     "bug_tracker_uri" => "#{spec.homepage}/-/issues",
-    "documentation_uri" => "https://gitlab.com/ruby-telegem/telegem/-/tree/main/docs-src?ref_type=heads",
+    "documentation_uri" => "https://github.com/slick-lab/telegem/tree/main/docs",
     "rubygems_mfa_required" => "false"
   }
   
@@ -55,12 +54,13 @@ Gem::Specification.new do |spec|
   spec.post_install_message = <<~MSG
     Thanks for installing Telegem #{Telegem::VERSION}!
     
-    📚 Documentation: #{spec.homepage}
+    Documentation: #{spec.homepage}
     
-    🔐 For SSL Webhooks:
+     For SSL Webhooks:
     Run: telegem-ssl your-domain.com
     This sets up Let's Encrypt certificates automatically.
-    
-    🤖 Happy bot building!
+
+    join the official telegram group: https://t.me/r_telegem
+     Happy bot building!
   MSG
 end
