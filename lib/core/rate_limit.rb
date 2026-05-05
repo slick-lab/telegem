@@ -79,7 +79,11 @@ module Telegem
       end
     end
     def rate_limit_response(ctx)
-      ctx.reply("⏳ Please wait a moment before sending another request.") rescue nil
+      begin
+        ctx.reply("⏳ Please wait a moment before sending another request.")
+      rescue StandardError => e
+        ctx.logger&.warn("Failed to send rate limit response: #{e.class}: #{e.message}")
+      end
       nil
     end
   end 
