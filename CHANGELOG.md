@@ -1,5 +1,10 @@
 # Telegem Changelog
 
+## v3.4.0(latest)
+
+- added bot api 9.6 full support 
+- all fixes from v3.3.2-rc.1
+
 
 ## v3.3.2-rc.1
 
