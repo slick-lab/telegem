@@ -91,7 +91,7 @@ module Telegem
                         can_join_groups can_read_all_group_messages 
                         supports_inline_queries language_code 
                         is_premium added_to_attachment_menu 
-                        can_connect_to_business].freeze
+                        can_connect_to_business can_manage_bots].freeze
       
       def initialize(data)
         super(data)
@@ -191,7 +191,7 @@ module Telegem
                         forward_from_message_id forward_signature 
                         forward_sender_name forward_date reply_to_message 
                         media_group_id author_signature 
-                        has_protected_content].freeze
+                        has_protected_content managed_bot_created managed_bot].freeze
       
       def initialize(data)
         super(data)
@@ -323,6 +323,10 @@ module Telegem
         wrap('general_forum_topic_hidden', GeneralForumTopicHidden)
         wrap('general_forum_topic_unhidden', GeneralForumTopicUnhidden)
         wrap('write_access_allowed', WriteAccessAllowed)
+        
+        # Bot API 9.6 - Managed Bot Support
+        wrap('managed_bot_created', ManagedBotCreated)
+        wrap('managed_bot', ManagedBotUpdated)
 
         # arrays of sizes and photos
         wrap_array('photo', PhotoSize)
@@ -405,7 +409,7 @@ module Telegem
                         edited_channel_post inline_query chosen_inline_result 
                         callback_query shipping_query pre_checkout_query 
                         poll poll_answer my_chat_member chat_member 
-                        chat_join_request].freeze
+                        chat_join_request managed_bot_created managed_bot].freeze
       
       def initialize(data)
         super(data)
@@ -432,6 +436,8 @@ module Telegem
         return :my_chat_member if my_chat_member
         return :chat_member if chat_member
         return :chat_join_request if chat_join_request
+        return :managed_bot_created if managed_bot_created
+        return :managed_bot if managed_bot
         :unknown
       end
       
@@ -455,6 +461,8 @@ module Telegem
           my_chat_member&.from || chat_member&.from
         when :chat_join_request
           chat_join_request.from
+        when :managed_bot_created, :managed_bot
+          managed_bot_created&.from || managed_bot&.from
         else
           nil
         end
@@ -485,6 +493,10 @@ module Telegem
         wrap('general_forum_topic_hidden', GeneralForumTopicHidden)
         wrap('general_forum_topic_unhidden', GeneralForumTopicUnhidden)
         wrap('write_access_allowed', WriteAccessAllowed)
+        
+        # Bot API 9.6 - Managed Bot Support
+        wrap('managed_bot_created', ManagedBotCreated)
+        wrap('managed_bot', ManagedBotUpdated)
       end
     end
 
@@ -528,7 +540,15 @@ module Telegem
       end
     end
 
-    class PollOption < BaseType; end
+    class PollOption < BaseType
+      def initialize(data)
+        super(data)
+        # Bot API 9.6 enhancements
+        wrap('added_by_user', User)
+        wrap('added_by_chat', Chat)
+      end
+    end
+    
     class PollAnswer < BaseType; end
 
     class Poll < BaseType
@@ -675,6 +695,6 @@ module Telegem
     class VideoChatEnded < BaseType; end
     class VideoChatParticipantsInvited < BaseType; end
     class VideoChatLocation < BaseType; end
-
-  end
-end
+    
+    # Bot API 9.6 - Managed Bot Support
+    class ManagedBotCreated < BaseType`*
