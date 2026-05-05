@@ -56,11 +56,11 @@ Gem::Specification.new do |spec|
     
     Documentation: #{spec.homepage}
     
-     For SSL Webhooks:
+    For SSL Webhooks:
     Run: telegem-ssl your-domain.com
     This sets up Let's Encrypt certificates automatically.
 
-    join the official telegram group: https://t.me/r_telegem
-     Happy bot building!
+    Join the official telegram group: https://t.me/r_telegem
+    Happy bot building!
   MSG
 end
