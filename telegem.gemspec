@@ -42,7 +42,7 @@ Gem::Specification.new do |spec|
   
   # Metadata
   spec.metadata = {
-    "homepage_uri" => "#{spec.homepage}/blob/main/README.md" ,
+    "homepage_uri" => "#{spec.homepage}/blob/main/README.md",
     "source_code_uri" => spec.homepage,
     "changelog_uri" => "#{spec.homepage}/blob/main/CHANGELOG.md",
     "bug_tracker_uri" => "#{spec.homepage}/issues",
