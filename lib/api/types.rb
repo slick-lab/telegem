@@ -5,70 +5,70 @@ module Telegem
         @_raw_data = data || {}
         @_accessors_defined = {}
       end
-      
+
       def method_missing(name, *args)
         return super if args.any? || block_given?
-        
+
         define_accessor(name)
-        
+
         if respond_to?(name)
           send(name)
         else
           super
         end
       end
-      
+
       def respond_to_missing?(name, include_private = false)
         key = name.to_s
         camel_key = snake_to_camel(key)
         @_raw_data.key?(key) || @_raw_data.key?(camel_key) || super
       end
-      
+
       def to_h
         @_raw_data.dup
       end
-      
+
       alias_method :to_hash, :to_h
-      
+
       def inspect
         "#<#{self.class.name} #{@_raw_data.inspect}>"
       end
-      
+
       def to_s
         inspect
       end
-      
+
       attr_reader :_raw_data
-      
+
       private
-      
+
       def define_accessor(name)
         return if @_accessors_defined[name]
-        
+
         key = name.to_s
         camel_key = snake_to_camel(key)
-        
+
         if @_raw_data.key?(key)
           define_singleton_method(name) { @_raw_data[key] }
         elsif @_raw_data.key?(camel_key)
           define_singleton_method(name) { @_raw_data[camel_key] }
         else
           define_singleton_method(name) do
-            raise NoMethodError, 
+            raise NoMethodError,
                   "undefined method `#{name}' for #{self.class} with keys: #{@_raw_data.keys}"
           end
         end
-        
+
         @_accessors_defined[name] = true
       end
-      
+
       # helpers for converting nested objects
       def wrap(key, klass)
         if @_raw_data[key] && !@_raw_data[key].is_a?(klass)
           @_raw_data[key] = klass.new(@_raw_data[key])
         end
       end
-      
+
       def wrap_array(key, klass)
         if @_raw_data[key] && @_raw_data[key].is_a?(Array)
           @_raw_data[key] = @_raw_data[key].map do |v|
@@ -76,35 +76,35 @@ module Telegem
           end
         end
       end
-      
+
       def snake_to_camel(str)
         str.gsub(/_([a-z])/) { $1.upcase }
       end
-      
+
       def camel_to_snake(str)
         str.gsub(/([A-Z])/) { "_#{$1.downcase}" }.sub(/^_/, '')
       end
     end
-    
+
     class User < BaseType
       COMMON_FIELDS = %w[id is_bot first_name last_name username
-                        can_join_groups can_read_all_group_messages 
-                        supports_inline_queries language_code 
-                        is_premium added_to_attachment_menu 
+                        can_join_groups can_read_all_group_messages
+                        supports_inline_queries language_code
+                        is_premium added_to_attachment_menu
                         can_connect_to_business can_manage_bots].freeze
-      
+
       def initialize(data)
         super(data)
-        
+
         COMMON_FIELDS.each do |field|
           define_accessor(field.to_sym)
         end
       end
-      
+
       def full_name
         [first_name, last_name].compact.join(' ')
       end
-      
+
       def mention
         if username
           "@#{username}"
@@ -114,127 +114,127 @@ module Telegem
           "User ##{id}"
         end
       end
-      
+
       def to_s
         full_name
       end
     end
-    
+
     class Chat < BaseType
       COMMON_FIELDS = %w[id type username title first_name last_name
-                        photo bio has_private_forwards 
+                        photo bio has_private_forwards
                         has_restricted_voice_and_video_messages
-                        description invite_link pinned_message 
+                        description invite_link pinned_message
                         permissions slow_mode_delay message_auto_delete_time
-                        has_protected_content sticker_set_name 
+                        has_protected_content sticker_set_name
                         can_set_sticker_set linked_chat_id location].freeze
-      
+
       def initialize(data)
         super(data)
-        
+
         COMMON_FIELDS.each do |field|
           define_accessor(field.to_sym)
         end
       end
-      
+
       def private?
         type == 'private'
       end
-      
+
       def group?
         type == 'group'
       end
-      
+
       def supergroup?
         type == 'supergroup'
       end
-      
+
       def channel?
         type == 'channel'
       end
-      
+
       def to_s
         title || username || "Chat ##{id}"
       end
     end
-    
+
     class MessageEntity < BaseType
       COMMON_FIELDS = %w[type offset length url user language
                         custom_emoji_id].freeze
-      
+
       def initialize(data)
         super(data)
-        
+
         COMMON_FIELDS.each do |field|
           define_accessor(field.to_sym)
         end
-        
+
         if @_raw_data['user'] && !@_raw_data['user'].is_a?(User)
           @_raw_data['user'] = User.new(@_raw_data['user'])
         end
       end
     end
-    
+
     class Message < BaseType
-      COMMON_FIELDS = %w[message_id from chat date edit_date 
-                        text caption entities caption_entities 
-                        audio document photo sticker video voice 
-                        video_note contact location venue 
-                        new_chat_members left_chat_member 
-                        new_chat_title new_chat_photo 
-                        delete_chat_photo group_chat_created 
-                        supergroup_chat_created channel_chat_created 
-                        migrate_to_chat_id migrate_from_chat_id 
-                        pinned_message invoice successful_payment 
-                        connected_website reply_markup via_bot 
-                        forward_from forward_from_chat 
-                        forward_from_message_id forward_signature 
-                        forward_sender_name forward_date reply_to_message 
-                        media_group_id author_signature 
+      COMMON_FIELDS = %w[message_id from chat date edit_date
+                        text caption entities caption_entities
+                        audio document photo sticker video voice
+                        video_note contact location venue
+                        new_chat_members left_chat_member
+                        new_chat_title new_chat_photo
+                        delete_chat_photo group_chat_created
+                        supergroup_chat_created channel_chat_created
+                        migrate_to_chat_id migrate_from_chat_id
+                        pinned_message invoice successful_payment
+                        connected_website reply_markup via_bot
+                        forward_from forward_from_chat
+                        forward_from_message_id forward_signature
+                        forward_sender_name forward_date reply_to_message
+                        media_group_id author_signature
                         has_protected_content managed_bot_created managed_bot].freeze
-      
+
       def initialize(data)
         super(data)
-        
+
         COMMON_FIELDS.each do |field|
           define_accessor(field.to_sym)
         end
-        
+
         convert_complex_fields
       end
-      
+
       def command?
         return false unless text && entities
-        
-        entities.any? { |e| e.type == 'bot_command' && 
+
+        entities.any? { |e| e.type == 'bot_command' &&
                            text[e.offset, e.length]&.start_with?('/') }
       end
-      
+
       def command_name
         return nil unless command?
-        
+
         command_entity = entities.find { |e| e.type == 'bot_command' }
         return nil unless command_entity
-        
+
         cmd = text[command_entity.offset, command_entity.length]
         return nil if cmd.nil? || cmd.length <= 1
-        
+
         cmd = cmd[1..-1]
         cmd.split('@').first.strip
       end
-      
+
       def command_args
         return nil unless command?
-        
+
         command_entity = entities.find { |e| e.type == 'bot_command' }
         return nil unless command_entity
-        
+
         args_start = command_entity.offset + command_entity.length
         remaining = text[args_start..-1]
-        
+
         next_entity = entities.select { |e| e.offset >= args_start }
                               .min_by(&:offset)
-        
+
         if next_entity
           args_end = next_entity.offset - 1
           text[args_start..args_end]&.strip
@@ -242,15 +242,15 @@ module Telegem
           remaining&.strip
         end
       end
-      
+
       def reply?
         !!reply_to_message
       end
-      
+
       def has_media?
         !!(audio || document || photo || video || voice || video_note || sticker)
       end
-      
+
       def media_type
         return :audio if audio
         return :document if document
@@ -261,9 +261,9 @@ module Telegem
         return :sticker if sticker
         nil
       end
-      
+
       private
-      
+
       def convert_complex_fields
         # time conversions
         @_raw_data['date'] = Time.at(@_raw_data['date']) if @_raw_data['date'] && !@_raw_data['date'].is_a?(Time)
@@ -323,7 +323,7 @@ module Telegem
         wrap('general_forum_topic_hidden', GeneralForumTopicHidden)
         wrap('general_forum_topic_unhidden', GeneralForumTopicUnhidden)
         wrap('write_access_allowed', WriteAccessAllowed)
-        
+
         # Bot API 9.6 - Managed Bot Support
         wrap('managed_bot_created', ManagedBotCreated)
         wrap('managed_bot', ManagedBotUpdated)
@@ -335,7 +335,7 @@ module Telegem
         # fall back to original media wrapper for backward compatibility
         wrap_media_objects
       end
-      
+
       def wrap_media_objects
         # Media files (fall‑back to generic types if no specific class defined)
         @_raw_data['document'] = Document.new(@_raw_data['document']) if @_raw_data['document'] && !@_raw_data['document'].is_a?(Document)
@@ -371,56 +371,56 @@ module Telegem
         end
       end
     end
-    
+
     class CallbackQuery < BaseType
       COMMON_FIELDS = %w[id from message inline_message_id chat_instance data game_short_name].freeze
-      
+
       def initialize(data)
         super(data)
-        
+
         COMMON_FIELDS.each do |field|
           define_accessor(field.to_sym)
         end
-        
+
         if @_raw_data['from'] && !@_raw_data['from'].is_a?(User)
           @_raw_data['from'] = User.new(@_raw_data['from'])
         end
-        
+
         if @_raw_data['message'] && !@_raw_data['message'].is_a?(Message)
           @_raw_data['message'] = Message.new(@_raw_data['message'])
         end
       end
-      
+
       def from_user?
         !!from
       end
-      
+
       def message?
         !!message
       end
-      
+
       def inline_message?
         !!inline_message_id
       end
     end
-    
+
     class Update < BaseType
-      COMMON_FIELDS = %w[update_id message edited_message channel_post 
-                        edited_channel_post inline_query chosen_inline_result 
-                        callback_query shipping_query pre_checkout_query 
-                        poll poll_answer my_chat_member chat_member 
+      COMMON_FIELDS = %w[update_id message edited_message channel_post
+                        edited_channel_post inline_query chosen_inline_result
+                        callback_query shipping_query pre_checkout_query
+                        poll poll_answer my_chat_member chat_member
                         chat_join_request managed_bot_created managed_bot].freeze
-      
+
       def initialize(data)
         super(data)
-        
+
         COMMON_FIELDS.each do |field|
           define_accessor(field.to_sym)
         end
-        
+
         convert_update_objects
       end
-      
+
       def type
         return :message if message
         return :edited_message if edited_message
@@ -440,7 +440,7 @@ module Telegem
         return :managed_bot if managed_bot
         :unknown
       end
-      
+
       def from
         case type
         when :message, :edited_message
@@ -467,9 +467,9 @@ module Telegem
           nil
         end
       end
-      
+
       private
-      
+
       def convert_update_objects
         wrap('message', Message)
         wrap('edited_message', Message)
@@ -493,7 +493,7 @@ module Telegem
         wrap('general_forum_topic_hidden', GeneralForumTopicHidden)
         wrap('general_forum_topic_unhidden', GeneralForumTopicUnhidden)
         wrap('write_access_allowed', WriteAccessAllowed)
-        
+
         # Bot API 9.6 - Managed Bot Support
         wrap('managed_bot_created', ManagedBotCreated)
         wrap('managed_bot', ManagedBotUpdated)
@@ -548,7 +548,7 @@ module Telegem
         wrap('added_by_chat', Chat)
       end
     end
-    
+
     class PollAnswer < BaseType; end
 
     class Poll < BaseType
@@ -695,6 +695,9 @@ module Telegem
     class VideoChatEnded < BaseType; end
     class VideoChatParticipantsInvited < BaseType; end
     class VideoChatLocation < BaseType; end
-    
     # Bot API 9.6 - Managed Bot Support
-    class ManagedBotCreated < BaseType`*
+    class ManagedBotCreated < BaseType; end
+    class ManagedBotDeleted < BaseType; end
+    class ManagedBotUpdated < BaseType; end
+    end
+  end
