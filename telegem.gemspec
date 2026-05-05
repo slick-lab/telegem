@@ -31,12 +31,12 @@ Gem::Specification.new do |spec|
   
   # Dependencies
   spec.add_dependency "securerandom", "~> 0.1"
-  spec.add_dependency "async", "~> 2.35.2"
+  spec.add_dependency "async", "~> 2.35"
   spec.add_dependency "async-http", "~> 0.92.1"
   spec.add_dependency "pdf-reader", "~> 2.14.1"
   spec.add_dependency "docx", "~> 0.10.0"
   
-  # Developmen
+  # Development
   spec.add_development_dependency "rspec", "~> 3.12"
   spec.add_development_dependency "rubocop", "~> 1.50"
   
