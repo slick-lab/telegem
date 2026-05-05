@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   
   spec.homepage      = "https://github.com/slick-lab/telegem"
   spec.license       = "MIT"
-  spec.required_ruby_version = ">= 3.4.0"
+  spec.required_ruby_version = ">= 3.1.0"
   
   # Files to include
   spec.files = Dir.chdir(__dir__) do
@@ -42,10 +42,10 @@ Gem::Specification.new do |spec|
   
   # Metadata
   spec.metadata = {
-    "homepage_uri" => "#{spec.homepage}/-/blob/main/README.md" ,
+    "homepage_uri" => "#{spec.homepage}/blob/main/README.md" ,
     "source_code_uri" => spec.homepage,
-    "changelog_uri" => "#{spec.homepage}/-/blob/main/CHANGELOG.md",
-    "bug_tracker_uri" => "#{spec.homepage}/-/issues",
+    "changelog_uri" => "#{spec.homepage}/blob/main/CHANGELOG.md",
+    "bug_tracker_uri" => "#{spec.homepage}/issues",
     "documentation_uri" => "https://github.com/slick-lab/telegem/tree/main/docs",
     "rubygems_mfa_required" => "false"
   }
