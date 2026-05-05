@@ -1,0 +1,57 @@
+AllCops:
+  TargetRubyVersion: 3.3
+  NewCops: enable
+  DisplayCopNames: true
+  Exclude:
+    - 'bin/**/*'
+    - 'node_modules/**/*'
+    - 'vendor/**/*'
+    - 'tmp/**/*'
+    - 'log/**/*'
+    - 'db/schema.rb'
+
+# Optional: enable extra cops if you add gems (rubocop-performance, rubocop-rspec, rubocop-security)
+# require:
+#   - rubocop-performance
+#   - rubocop-rspec
+#   - rubocop-security
+
+Layout/LineLength:
+  Max: 100
+
+Layout/IndentationWidth:
+  Width: 2
+
+Metrics/MethodLength:
+  Max: 30
+  CountComments: false
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - 'test/**/*'
+  Max: 200
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+
+Naming/PredicateName:
+  Enabled: true
+
+Lint/UnusedMethodArgument:
+  Enabled: true
+
+Lint/UselessAssignment:
+  Enabled: true
+
+Style/Documentation:
+  Enabled: false
+
+# Allow longer files for generated code
+Metrics/LineLength:
+  Exclude:
+    - 'assets/**/*'
+    - 'vendor/**/*'
