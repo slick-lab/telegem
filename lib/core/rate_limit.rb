@@ -63,7 +63,6 @@ module Telegem
     end
     
     def increment_counters(ctx)
-      now = Time.now.to_i
       if @options[:global]
         key = "global"
         @counters[:global].increment(key, 1, ttl: @options[:global][:per])
