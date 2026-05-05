@@ -4,7 +4,14 @@
 
 - added bot api 9.6 full support 
 - all fixes from v3.3.2-rc.1
-
+- enhanced install message
+- requires ruby v >= 3.4.x
+- added bot api 9.6 helper to ctx
+- introduced redis store to `session/redis_store.rb`
+- new translate plugin
+- added more docs to support telegem -v 3.x
+- improved error message on invalid middlewares
+- removed `concurrent-ruby` gem to keep telegem lightweight
 
 ## v3.3.2-rc.1
 
