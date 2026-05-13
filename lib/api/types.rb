@@ -91,7 +91,8 @@ module Telegem
                         can_join_groups can_read_all_group_messages
                         supports_inline_queries language_code
                         is_premium added_to_attachment_menu
-                        can_connect_to_business can_manage_bots].freeze
+                        can_connect_to_business can_manage_bots
+                        supports_guest_queries].freeze
 
       def initialize(data)
         super(data)
@@ -191,7 +192,9 @@ module Telegem
                         forward_from_message_id forward_signature
                         forward_sender_name forward_date reply_to_message
                         media_group_id author_signature
-                        has_protected_content managed_bot_created managed_bot].freeze
+                        has_protected_content managed_bot_created managed_bot
+                        guest_bot_caller_user guest_bot_caller_chat
+                        guest_query_id live_photo].freeze
 
       def initialize(data)
         super(data)
@@ -301,6 +304,10 @@ module Telegem
         wrap('voice', Voice)
         wrap('video_note', VideoNote)
         wrap('sticker', Sticker)
+        wrap('live_photo', LivePhoto)
+
+        wrap('guest_bot_caller_user', User)
+        wrap('guest_bot_caller_chat', Chat)
 
         wrap('invoice', Invoice)
         wrap('successful_payment', SuccessfulPayment)
@@ -409,7 +416,8 @@ module Telegem
                         edited_channel_post inline_query chosen_inline_result
                         callback_query shipping_query pre_checkout_query
                         poll poll_answer my_chat_member chat_member
-                        chat_join_request managed_bot_created managed_bot].freeze
+                        chat_join_request managed_bot_created managed_bot
+                        guest_message].freeze
 
       def initialize(data)
         super(data)
@@ -438,6 +446,7 @@ module Telegem
         return :chat_join_request if chat_join_request
         return :managed_bot_created if managed_bot_created
         return :managed_bot if managed_bot
+        return :guest_message if guest_message
         :unknown
       end
 
@@ -463,6 +472,8 @@ module Telegem
           chat_join_request.from
         when :managed_bot_created, :managed_bot
           managed_bot_created&.from || managed_bot&.from
+        when :guest_message
+          guest_message.from
         else
           nil
         end
@@ -497,6 +508,8 @@ module Telegem
         # Bot API 9.6 - Managed Bot Support
         wrap('managed_bot_created', ManagedBotCreated)
         wrap('managed_bot', ManagedBotUpdated)
+        # Bot API 10.0 - Guest Message Support
+        wrap('guest_message', SentGuestMessage)
       end
     end
 
@@ -546,6 +559,8 @@ module Telegem
         # Bot API 9.6 enhancements
         wrap('added_by_user', User)
         wrap('added_by_chat', Chat)
+        # Bot API 10.0 - media support
+        wrap('media', InputPollOptionMedia)
       end
     end
 
@@ -556,10 +571,19 @@ module Telegem
         super(data)
         wrap_array('options', PollOption)
         wrap_array('explanation_entities', MessageEntity)
+        # Bot API 10.0 - poll media support
+        wrap('media', PollMedia)
+        wrap('explanation_media', PollMedia)
       end
     end
 
-    class ChatPermissions < BaseType; end
+    class ChatPermissions < BaseType
+      def initialize(data)
+        super(data)
+        # Bot API 10.0 - reaction support
+        define_accessor(:can_react_to_messages)
+      end
+    end
     class ChatPhoto < BaseType; end
     class ChatInviteLink < BaseType; end
 
@@ -568,7 +592,13 @@ module Telegem
     class ChatMemberOwner < ChatMember; end
     class ChatMemberAdministrator < ChatMember; end
     class ChatMemberMember < ChatMember; end
-    class ChatMemberRestricted < ChatMember; end
+    class ChatMemberRestricted < ChatMember
+      def initialize(data)
+        super(data)
+        # Bot API 10.0 - reaction support
+        define_accessor(:can_react_to_messages)
+      end
+    end
     class ChatMemberLeft < ChatMember; end
     class ChatMemberBanned < ChatMember; end
 
@@ -699,5 +729,29 @@ module Telegem
     class ManagedBotCreated < BaseType; end
     class ManagedBotDeleted < BaseType; end
     class ManagedBotUpdated < BaseType; end
+
+    # Bot API 10.0 - Guest Mode Support
+    class SentGuestMessage < BaseType; end
+
+    # Bot API 10.0 - Poll Media Support
+    class PollMedia < BaseType; end
+    class InputPollMedia < BaseType; end
+    class InputPollOptionMedia < BaseType; end
+
+    # Bot API 10.0 - Live Photo Support
+    class LivePhoto < BaseType
+      def initialize(data)
+        super(data)
+        wrap('photo', PhotoSize)
+        wrap('video', Video)
+      end
+    end
+
+    class InputMediaLivePhoto < BaseType; end
+    class PaidMediaLivePhoto < BaseType; end
+    class InputPaidMediaLivePhoto < BaseType; end
+
+    # Bot API 10.0 - Business Access Settings
+    class BotAccessSettings < BaseType; end
     end
   end

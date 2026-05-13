@@ -1,6 +1,25 @@
 # Telegem Changelog
 
-## v3.4.0(latest)
+## v3.5.0 (latest)
+
+### Added
+- **Bot API 10.0 Full Support**
+  - Guest mode support: `SentGuestMessage` type and `guest_message` update type
+  - Message reactions: Support for deleting reactions via `call('deleteAllMessageReactions', ...)` and `call('deleteMessageReaction', ...)`
+  - Live photos: `LivePhoto`, `InputMediaLivePhoto`, `PaidMediaLivePhoto`, `InputPaidMediaLivePhoto` types
+  - Poll media enhancements: `PollMedia`, `InputPollMedia`, `InputPollOptionMedia` types
+  - Business access: New types and methods accessible via generic `call` method
+  - Enhanced chat administrators: Support for `return_bots` parameter in `getChatAdministrators`
+  - User guest query support: `supports_guest_queries` field in User type
+  - Message guest fields: `guest_bot_caller_user`, `guest_bot_caller_chat`, `guest_query_id`, `live_photo` in Message type
+  - Poll media fields: `media`, `explanation_media` in Poll type; `media` in PollOption type
+  - Reaction permissions: `can_react_to_messages` in ChatPermissions and ChatMemberRestricted types
+
+### Changed
+- Updated API version support to Bot API 10.0
+- All new API methods automatically supported through generic `call()` and `call!()` methods
+
+## v3.4.0
 
 - added bot api 9.6 full support 
 - all fixes from v3.3.2-rc.1
