@@ -51,7 +51,7 @@ Gem::Specification.new do |spec|
   
   # Install message with SSL info
   spec.post_install_message = <<~MSG
-    Thanks for installing Telegem #{Telegem::VERSION}!
+    Thanks for installing Telegem #{spec.version}!
     
     Documentation: #{spec.homepage}
     
