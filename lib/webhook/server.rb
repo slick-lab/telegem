@@ -128,7 +128,7 @@ module Telegem
 
         begin
           body = request.body.read
-          update_data = JSON.parse(body)
+          update_data = json_to_symbols(JSON.parse(body))
           process_webhook_update(update_data)
           [200, {}, ["OK"]]
         rescue JSON::ParserError => e
@@ -193,6 +193,17 @@ module Telegem
 
       def running?
         @running
+      end
+
+      ‪def json_to_symbols(obj)
+         case obj
+           when Hash
+            obj.transform_keys { |k| k.to_sym }.transform_values { |v| json_to_symbols(v) }
+           when Array
+            obj.map { |v| json_to_symbols(v) }
+           else
+            obj
+          end
       end
     end
   end
