@@ -24,15 +24,7 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby-version }}
+        bundler-cache: true  # This handles all dependencies automatically
     
-    - name: Install dependencies
-      run: |
-        gem install rspec
-        gem install rack-test
-        # Install telegem dependencies from gemspec
-        gem build telegem.gemspec
-        gem install *.gem
-    
-    - name: Run all tests
-      run: |
-        ruby -r rspec -e 'RSpec::Core::Runner.run(["test/spec.rb", "test/webhook_spec.rb"])'
+    - name: Run tests
+      run: bundle exec rspec test/spec.rb test/webhook_spec.rb
