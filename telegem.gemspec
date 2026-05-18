@@ -3,7 +3,7 @@ require_relative 'lib/telegem'
 
 Gem::Specification.new do |spec|
   spec.name          = "telegem"
-  spec.version       = Telegem::VERSION
+  spec.version       = "3.5.0"
   spec.authors       = ["zendrx"]
   spec.email         = ["ynwghosted@icloud.com"]
   
