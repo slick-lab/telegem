@@ -104,28 +104,38 @@ module Telegem
       end
 
       def handle_request(request)
-        case request.path
-        when @secret_token, "/#{@secret_token}"
-          handle_webhook_request(request)
-        when '/health', '/healthz'
-          health_endpoint(request)
-        else
-          [404, {}, ["Not Found"]]
+        begin
+          case request.path
+          when @secret_token, "/#{@secret_token}"
+            handle_webhook_request(request)
+          when '/health', '/healthz'
+            health_endpoint(request)
+          else
+            [404, {}, ["Not Found"]]
+          end
+        rescue => e
+          @logger.error("Request handler error: #{e.class} - #{e.message}\n#{e.backtrace.join("\n")}")
+          [500, {}, ["Internal Server Error"]]
         end
       end
 
       def handle_webhook_request(request)
         return [405, {}, ["Method Not Allowed"]] unless request.post?
+        
         received = request.headers['X-Telegram-Bot-Api-Secret-Token'] ||
-           request.headers['x-telegram-bot-api-secret-token']
-        return [403, {}, ["Forbidden"]] unless received  == @secret_token
+                   request.headers['x-telegram-bot-api-secret-token']
+        return [403, {}, ["Forbidden"]] unless received == @secret_token
 
         begin
           body = request.body.read
           update_data = JSON.parse(body)
-           process_webhook_update(update_data) 
+          process_webhook_update(update_data)
           [200, {}, ["OK"]]
-        rescue
+        rescue JSON::ParserError => e
+          @logger.error("JSON parse error: #{e}")
+          [400, {}, ["Bad Request"]]
+        rescue => e
+          @logger.error("Webhook handler error: #{e.class} - #{e.message}")
           [500, {}, ["Internal Server Error"]]
         end
       end
@@ -137,11 +147,12 @@ module Telegem
       end
 
       def health_endpoint(request)
-        [200, { 'Content-Type' => 'application/json' }, [{
+        body = {
           status: 'ok',
           mode: @ssl_mode.to_s,
           ssl: @ssl_mode != :none
-        }.to_json]]
+        }.to_json
+        [200, { 'Content-Type' => 'application/json' }, [body]]
       end
 
       def stop

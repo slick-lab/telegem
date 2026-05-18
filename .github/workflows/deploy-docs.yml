@@ -1,0 +1,309 @@
+name: Build and Deploy Docs
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - '.github/workflows/deploy-docs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install markdown2 pyyaml
+
+      - name: Create docs build directory
+        run: mkdir -p _build
+
+      - name: Copy markdown files
+        run: |
+          cp -r docs/* _build/ 2>/dev/null || true
+          echo "📚 Documentation files copied"
+
+      - name: Generate HTML from Markdown
+        run: |
+          python3 << 'EOF'
+          import os
+          import markdown2
+          from pathlib import Path
+
+          # Create output directories
+          Path('_build/html').mkdir(exist_ok=True)
+          
+          # Generate HTML from each markdown file
+          for md_file in Path('_build').glob('*.md'):
+              if md_file.name.startswith('_'):
+                  continue
+              
+              try:
+                  with open(md_file, 'r', encoding='utf-8') as f:
+                      content = f.read()
+                  
+                  # Convert markdown to HTML with extras
+                  html = markdown2.markdown(
+                      content,
+                      extras=['tables', 'fenced-code-blocks', 'code-friendly', 'break-on-newline']
+                  )
+                  
+                  # Wrap in basic HTML template
+                  html_page = f'''<!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>{md_file.stem.replace('_', ' ').title()} - Telegem Documentation</title>
+              <style>
+                  * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                  body {{
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                      line-height: 1.6;
+                      color: #333;
+                      background: #f5f5f5;
+                  }}
+                  .navbar {{
+                      background: #2d3748;
+                      color: white;
+                      padding: 1rem;
+                      position: sticky;
+                      top: 0;
+                      z-index: 1000;
+                  }}
+                  .navbar a {{ color: #fff; text-decoration: none; margin-right: 1.5rem; }}
+                  .navbar a:hover {{ text-decoration: underline; }}
+                  .container {{
+                      max-width: 900px;
+                      margin: 0 auto;
+                      padding: 2rem 1rem;
+                      background: white;
+                      min-height: 100vh;
+                  }}
+                  h1, h2, h3 {{ margin-top: 1.5rem; margin-bottom: 0.5rem; }}
+                  h1 {{ border-bottom: 2px solid #007bff; padding-bottom: 0.5rem; }}
+                  code {{
+                      background: #f4f4f4;
+                      padding: 0.2em 0.4em;
+                      border-radius: 3px;
+                      font-family: 'Courier New', monospace;
+                  }}
+                  pre {{
+                      background: #2d3748;
+                      color: #e2e8f0;
+                      padding: 1rem;
+                      border-radius: 5px;
+                      overflow-x: auto;
+                      margin: 1rem 0;
+                  }}
+                  pre code {{ background: none; padding: 0; color: inherit; }}
+                  blockquote {{
+                      border-left: 4px solid #007bff;
+                      padding-left: 1rem;
+                      margin: 1rem 0;
+                      color: #666;
+                  }}
+                  table {{
+                      width: 100%;
+                      border-collapse: collapse;
+                      margin: 1rem 0;
+                  }}
+                  table, th, td {{ border: 1px solid #ddd; }}
+                  th {{ background: #f4f4f4; padding: 0.5rem; }}
+                  td {{ padding: 0.5rem; }}
+                  a {{ color: #007bff; text-decoration: none; }}
+                  a:hover {{ text-decoration: underline; }}
+                  .toc {{
+                      background: #f9f9f9;
+                      padding: 1rem;
+                      border-radius: 5px;
+                      margin: 1rem 0;
+                      border: 1px solid #ddd;
+                  }}
+                  .toc h3 {{ margin-top: 0; }}
+                  .toc ul {{ list-style: none; padding-left: 0; }}
+                  .toc li {{ margin: 0.5rem 0; }}
+                  .toc a {{ color: #007bff; }}
+                  footer {{
+                      background: #f5f5f5;
+                      text-align: center;
+                      padding: 1rem;
+                      margin-top: 2rem;
+                      border-top: 1px solid #ddd;
+                      color: #666;
+                      font-size: 0.9rem;
+                  }}
+              </style>
+          </head>
+          <body>
+              <nav class="navbar">
+                  <a href="/telegem">Telegem Docs</a>
+                  <a href="index.html">Home</a>
+                  <a href="getting_started.html">Getting Started</a>
+                  <a href="webhooks.html">Webhooks</a>
+                  <a href="handlers.html">Handlers</a>
+                  <a href="https://github.com/slick-lab/telegem" target="_blank">GitHub</a>
+              </nav>
+              <div class="container">
+                  {html}
+              </div>
+              <footer>
+                  <p>Telegem Documentation | <a href="https://github.com/slick-lab/telegem">View on GitHub</a></p>
+              </footer>
+          </body>
+          </html>
+          '''
+                  
+                  html_file = Path('_build/html') / f'{md_file.stem}.html'
+                  with open(html_file, 'w', encoding='utf-8') as f:
+                      f.write(html_page)
+                  
+                  print(f"✅ Generated: {html_file.name}")
+              except Exception as e:
+                  print(f"⚠️  Error processing {md_file.name}: {e}")
+          EOF
+
+      - name: Create index page
+        run: |
+          cat > _build/html/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Telegem Documentation</title>
+              <style>
+                  * { margin: 0; padding: 0; box-sizing: border-box; }
+                  body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                      line-height: 1.6;
+                      color: #333;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      min-height: 100vh;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                  }
+                  .hero {
+                      background: white;
+                      border-radius: 10px;
+                      padding: 3rem;
+                      max-width: 600px;
+                      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                      text-align: center;
+                  }
+                  h1 { font-size: 2.5rem; margin-bottom: 1rem; color: #667eea; }
+                  .subtitle { color: #666; font-size: 1.1rem; margin-bottom: 2rem; }
+                  .docs-grid {
+                      display: grid;
+                      grid-template-columns: 1fr 1fr;
+                      gap: 1rem;
+                      margin: 2rem 0;
+                  }
+                  .doc-card {
+                      background: #f8f9fa;
+                      padding: 1.5rem;
+                      border-radius: 8px;
+                      text-decoration: none;
+                      color: #333;
+                      border: 2px solid transparent;
+                      transition: all 0.3s ease;
+                  }
+                  .doc-card:hover {
+                      border-color: #667eea;
+                      transform: translateY(-2px);
+                      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+                  }
+                  .doc-card h3 { color: #667eea; margin-bottom: 0.5rem; }
+                  .doc-card p { font-size: 0.9rem; color: #666; }
+                  .footer-links {
+                      margin-top: 2rem;
+                      padding-top: 2rem;
+                      border-top: 1px solid #ddd;
+                  }
+                  .footer-links a {
+                      color: #667eea;
+                      text-decoration: none;
+                      margin: 0 1rem;
+                  }
+                  .footer-links a:hover { text-decoration: underline; }
+              </style>
+          </head>
+          <body>
+              <div class="hero">
+                  <h1>Telegem Docs</h1>
+                  <p class="subtitle">Build amazing Telegram bots with Ruby</p>
+                  
+                  <div class="docs-grid">
+                      <a href="getting_started.html" class="doc-card">
+                          <h3>Getting Started</h3>
+                          <p>Start building your first bot</p>
+                      </a>
+                      <a href="webhooks.html" class="doc-card">
+                          <h3>Webhooks</h3>
+                          <p>Deploy with webhooks</p>
+                      </a>
+                      <a href="handlers.html" class="doc-card">
+                          <h3>Handlers</h3>
+                          <p>Handle messages and commands</p>
+                      </a>
+                      <a href="api.html" class="doc-card">
+                          <h3>API Reference</h3>
+                          <p>Complete API documentation</p>
+                      </a>
+                  </div>
+                  
+                  <div class="footer-links">
+                  <a href="https://github.com/slick-lab/telegem" target="_blank">GitHub</a>
+                  <a href="https://rubygems.org/gems/telegem" target="_blank">RubyGems</a>
+                  </div>
+              </div>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: '_build/html'
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

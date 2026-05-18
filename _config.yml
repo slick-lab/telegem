@@ -1,0 +1,10 @@
+site:
+  title: Telegem Documentation
+  description: Build Telegram bots with Ruby - Complete documentation and guides
+  url: https://slick-lab.github.io/telegem
+  baseurl: /telegem
+theme: jekyll-theme-slate
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
