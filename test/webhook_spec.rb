@@ -1,5 +1,5 @@
 require_relative 'spec_helper'
-require 'lib/webhook/server'
+require '../lib/webhook/server'
 require 'json'
 
 RSpec.describe Telegem::Webhook::Server do
