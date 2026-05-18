@@ -38,6 +38,9 @@ Gem::Specification.new do |spec|
   # Development
   spec.add_development_dependency "rspec", "~> 3.12"
   spec.add_development_dependency "rubocop", "~> 1.50"
+
+  # runtime
+  spec.add_runtime_dependency 'logger', '~> 1.6'
   
   # Metadata
   spec.metadata = {
