@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require_relative 'spec_helper'
-require 'telegem/api/types'
-require 'telegem/core/bot'
-require 'telegem/markup/keyboard'
-require 'telegem/markup/inline'
+require 'lib/api/types'
+require 'lib/core/bot'
+require 'lib/markup/keyboard'
+require 'lib/markup/inline'
 
 RSpec.describe Telegem do
   it 'has a version number' do
