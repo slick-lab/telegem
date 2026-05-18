@@ -1,5 +1,4 @@
 # telegem.gemspec
-require_relative 'lib/telegem'
 
 Gem::Specification.new do |spec|
   spec.name          = "telegem"
