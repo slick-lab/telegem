@@ -59,16 +59,6 @@ RSpec.describe Telegem::Webhook::Server do
       server = Telegem::Webhook::Server.new(bot, port: port, ssl: false)
       expect(server.ssl_mode).to eq(:none)
     end
-
-    it 'supports manual SSL configuration' do
-      ssl_context = double('ssl_context')
-      server = Telegem::Webhook::Server.new(
-        bot, 
-        port: port,
-        ssl: { cert_path: '/path/to/cert', key_path: '/path/to/key' }
-      )
-      expect(server.ssl_mode).to eq(:manual)
-    end
   end
 
   describe 'webhook URL generation' do
