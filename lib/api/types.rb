@@ -53,10 +53,7 @@ module Telegem
         elsif @_raw_data.key?(camel_key)
           define_singleton_method(name) { @_raw_data[camel_key] }
         else
-          define_singleton_method(name) do
-            raise NoMethodError,
-                  "undefined method `#{name}' for #{self.class} with keys: #{@_raw_data.keys}"
-          end
+          define_singleton_method(name) { nil } 
         end
 
         @_accessors_defined[name] = true
