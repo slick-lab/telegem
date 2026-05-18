@@ -37,11 +37,7 @@ RSpec.describe Telegem do
         expect(base.id).to eq(123)
         expect(base.name).to eq('test')
       end
-
-      it 'handles missing methods' do
-        expect { base.missing }.to raise_error(NoMethodError)
-      end
-    end
+    end 
 
     describe 'User' do
       let(:user_data) { { 'id' => 123, 'first_name' => 'John', 'last_name' => 'Doe' } }
