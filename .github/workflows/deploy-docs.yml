@@ -28,12 +28,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.2'
-          bundler-cache: true
-
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
