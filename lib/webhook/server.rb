@@ -195,7 +195,7 @@ module Telegem
         @running
       end
 
-      ‪def json_to_symbols(obj)
+      def json_to_symbols(obj)
          case obj
            when Hash
             obj.transform_keys { |k| k.to_sym }.transform_values { |v| json_to_symbols(v) }
