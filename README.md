@@ -3,6 +3,7 @@
 Welcome to the comprehensive documentation for Telegem, a modern Ruby framework for building Telegram bots.
 
 [![CodeQl](https://github.com/slick-lab/telegem/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/slick-lab/telegem/actions/workflows/github-code-scanning/codeql)
+[![Lines of Code](https://img.shields.io/badge/LOC-2907-red)](https://github.com/slick-lab/telegem)
 [![Gem Version](https://badge.fury.io/rb/telegem.svg)](https://badge.fury.io/rb/telegem)
 [![Join Telegram Group](https://img.shields.io/badge/Telegram-Join%20Group-2CA5E0?style=flat-square&logo=telegram&logoColor=white)](https://t.me/r_telegem)
 
