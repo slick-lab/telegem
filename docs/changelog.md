@@ -1,182 +1,147 @@
-# Changelog
+# Telegem Changelog
 
-All notable changes to Telegem will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
+## v3.5.0 (latest)
 
 ### Added
-- Comprehensive documentation covering all features and edge cases
-- Error handling guide with recovery strategies
-- Deployment guides for various platforms (Heroku, Docker, AWS)
-- Testing framework with examples and best practices
-- Troubleshooting guide for common issues
-- Performance optimization tips
-- Security best practices
-- Plugin development guide
-- Async operation handling
-- Rate limiting middleware
-- Health check endpoints
-- Structured logging support
-- Connection pooling for better performance
-- Graceful degradation features
-- Input validation middleware
-- Monitoring and metrics collection
+- **Bot API 10.0 Full Support**
+  - Guest mode support: `SentGuestMessage` type and `guest_message` update type
+  - Message reactions: Support for deleting reactions via `call('deleteAllMessageReactions', ...)` and `call('deleteMessageReaction', ...)`
+  - Live photos: `LivePhoto`, `InputMediaLivePhoto`, `PaidMediaLivePhoto`, `InputPaidMediaLivePhoto` types
+  - Poll media enhancements: `PollMedia`, `InputPollMedia`, `InputPollOptionMedia` types
+  - Business access: New types and methods accessible via generic `call` method
+  - Enhanced chat administrators: Support for `return_bots` parameter in `getChatAdministrators`
+  - User guest query support: `supports_guest_queries` field in User type
+  - Message guest fields: `guest_bot_caller_user`, `guest_bot_caller_chat`, `guest_query_id`, `live_photo` in Message type
+  - Poll media fields: `media`, `explanation_media` in Poll type; `media` in PollOption type
+  - Reaction permissions: `can_react_to_messages` in ChatPermissions and ChatMemberRestricted types
 
 ### Changed
-- Improved error messages and user feedback
-- Enhanced session management with TTL support
-- Better async operation handling
-- More robust webhook server implementation
-- Improved plugin architecture
+- Updated API version support to Bot API 10.0
+- All new API methods automatically supported through generic `call()` and `call!()` methods
+
+## v3.4.0
+
+- added bot api 9.6 full support 
+- all fixes from v3.3.2-rc.1
+- enhanced install message
+- requires ruby v >= 3.4.x
+- added bot api 9.6 helper to ctx
+- introduced redis store to `session/redis_store.rb`
+- new translate plugin
+- added more docs to support telegem -v 3.x
+- improved error message on invalid middlewares
+- removed `concurrent-ruby` gem to keep telegem lightweight
+
+## v3.3.2-rc.1
 
 ### Fixed
-- Memory leaks in long-running processes
-- Race conditions in concurrent operations
-- File upload size validation
-- SSL certificate handling
-- Session persistence issues
+- Webhook `set_webhook` now correctly passes URL as positional argument
+- Removed unsafe thread usage in `Context#with_typing` (async-safe now)
+- Added automatic retry with exponential backoff in API client
+- Improved `telegem-ssl` to detect dnf/yum on Fedora/RHEL
 
-## [1.0.0] - 2024-01-15
+### Changed
+- No breaking changes. Safe upgrade from v3.3.1.
 
-### Added
-- Initial release of Telegem framework
-- Core bot functionality with command and hears handlers
-- Telegram API client with automatic retries
-- Session management with memory and Redis stores
-- Scene system for multi-step conversations
-- Inline and reply keyboard DSL
-- Webhook and polling support
-- FileExtract plugin for document processing
-- Translate plugin for text translation
-- Middleware system for request processing
-- Type-safe API response handling
-- Comprehensive error handling
-- Async I/O support with Async gem
-- Rate limiting and timeout handling
-- SSL/TLS support for webhooks
 
-### Technical Details
-- Ruby 3.0+ requirement
-- Async gem for concurrency
-- Modular architecture with plugins
-- RESTful API design
-- Comprehensive test coverage
-- Production-ready deployment options
+## v3.3.1
+### Features 
+- improved memeorystore to include diskbackup
+- added 'telegem-init' cli 
 
----
 
-## Version History
+## v3.1.1 
 
-### Pre-1.0 Releases
+### New Features
 
-#### [0.5.0] - 2023-12-01
-- Beta release with core functionality
-- Basic bot operations
-- API client implementation
-- Handler system
-- Session management
+-FileExtractor Plugin: New plugin for extracting content from various file types (PDF, JSON, HTML, TXT)
+- Async File Download: Added download method to API client for downloading Telegram files
+- Context File Helpers: Added download_file, download_photo, download_document methods to Context
+- Extended File Support: Plugin supports PDF text extraction, JSON parsing, HTML/raw text processing
+- Async/Sync Dual Mode: All file operations available in both sync (download) and async (download!) modes
 
-#### [0.3.0] - 2023-11-15
-- Alpha release
-- Basic Telegram API integration
-- Command parsing
-- Message handling
+## v3.1.0 
 
-#### [0.1.0] - 2023-10-01
-- Initial prototype
-- Basic bot framework structure
-- Proof of concept implementation
+### features 
+- BREAKING: Rewrote polling system to prevent duplicate messages
+- Fixed thread deadlock in async polling loop
+- Added scene_middleware.rb for scene-based conversations
+- Improved MemoryStore with TTL and thread safety
+- Enhanced keyboard markup builder with web_app support
+-  Added message reaction and chat boost update types
+- Fixed callback query handling for inline keyboards
 
-## Migration Guide
+## v3.0.0
+### features 
 
-### Upgrading from 0.x to 1.0
+- BREAKING: Complete async rewrite with async gem
+- New HTTP client using HTTPX with proper async/await pattern
+- Added scene system for multi-step conversations
+- Middleware composer system for plugin architecture
+- Type system with dynamic accessors for Telegram objects
+- Session management with memory store
+- Rate limiting middleware
+- File upload support via multipart forms
 
-#### Breaking Changes
-1. **Handler Registration:**
-   ```ruby
-   # Old
-   bot.on('/start') { |ctx| ... }
+## v2.0.0
 
-   # New
-   bot.command('start') { |ctx| ... }
-   ```
+- BREAKING: Ruby 3.0+ requirement
+- Added webhook support with Rack middleware
+- Inline query and callback query handlers
+- Location, contact, and poll answer handlers
+- Keyboard markup helpers (Telegem::Markup)
+- Improved error handling with custom error classes
+- Logging integration with configurable loggers
 
-2. **Session Store:**
-   ```ruby
-   # Old
-   bot.session_store = Redis.new
+## v1.5.0
 
-   # New
-   bot.session_store = Telegem::Session::RedisStore.new(ENV['REDIS_URL'])
-   ```
+- Added command argument parsing (ctx.command_args)
+- Message entity parsing (mentions, hashtags, bot commands)
+- Chat member update handlers
+- Pre-checkout and shipping query support
+- File download helper methods
+- Context helper methods for common API calls
 
-3. **Middleware:**
-   ```ruby
-   # Old
-   bot.middleware.add(MyMiddleware)
+## v1.0.0
 
-   # New
-   bot.use MyMiddleware.new
-   ```
+- Stable API release
+- Message handlers with text pattern matching
+- Command handlers with regex support
+- Basic context object with chat/message accessors
+- Simple API client with error handling
+- Polling and webhook modes
+- Configuration options for timeout and limits
 
-#### New Features
-- Async operations support
-- Plugin system
-- Enhanced error handling
-- Webhook SSL support
-- Scene system improvements
+## v0.5.0
 
-#### Migration Steps
-1. Update handler registrations
-2. Configure new session store format
-3. Update middleware usage
-4. Add error handling
-5. Test thoroughly
+- Added callback query support
+- Inline keyboard builder
+- Message editing and deletion helpers
+- Media sending methods (photo, document, audio, video)
+- Chat action methods (typing, upload indicators)
 
-## Future Plans
+## v0.3.0
 
-### Version 1.1.0 (Planned)
-- [ ] Database session store
-- [ ] Message queue integration
-- [ ] Advanced rate limiting
-- [ ] Bot analytics dashboard
-- [ ] Multi-language support
+- Middleware system with bot.use
+- Session management foundation
+- Basic rate limiting
+- Command filtering by chat type
+- Improved logging with debug levels
 
-### Version 1.2.0 (Planned)
-- [ ] Voice message handling
-- [ ] Location services integration
-- [ ] Payment processing
-- [ ] Bot-to-bot communication
-- [ ] Advanced scene workflows
+## v0.2.0
 
-### Version 2.0.0 (Planned)
-- [ ] GraphQL API support
-- [ ] Real-time updates with WebSocket
-- [ ] Machine learning integrations
-- [ ] Advanced NLP features
-- [ ] Multi-platform bot support
+- Basic polling implementation
+- Message type detection (text, photo, document)
+- Command parsing with arguments
+- Simple reply methods
+- Error handling for API calls
 
-## Contributing
+## v0.1.0 (Initial Release)
 
-When contributing to Telegem, please:
-1. Update the changelog with your changes
-2. Follow the existing format
-3. Add entries under [Unreleased] section
-4. Categorize changes as Added, Changed, Fixed, or Removed
-
-## Categories
-
-- **Added** for new features
-- **Changed** for changes in existing functionality
-- **Deprecated** for soon-to-be removed features
-- **Removed** for now removed features
-- **Fixed** for any bug fixes
-- **Security** in case of vulnerabilities
+- Basic Telegram Bot API wrapper
+- Send/receive messages
+- Simple command handling
+- Minimal dependencies (just httparty)
+- Support for basic message types
 
 ---
-
-This changelog follows the principles of [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and is automatically updated with each release.</content>
-<parameter name="filePath">/home/slick/telegem/docs/changelog.md
