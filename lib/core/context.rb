@@ -124,6 +124,62 @@ module Telegem
         params = { chat_id: chat.id, text: text }.merge(options)
         @bot.api.call('sendMessage', params)
       end
+
+      def reply_rich(rich_message, **options)
+       return nil unless chat
+  
+       params = { chat_id: chat.id, rich_message: rich_message }.merge(options)
+       @bot.api.call('sendRichMessage', params)
+      end
+
+      # Draft streaming support (Bot API 10.1)
+def start_draft(initial_text = "", **options)
+  return nil unless chat
+  
+  draft_id = "draft_#{chat.id}_#{Time.now.to_i}_#{rand(1000)}"
+  session[:telegem_draft_id] = draft_id
+  
+  rich_message = { blocks: [{ type: "paragraph", content: initial_text }] }
+  params = { chat_id: chat.id, draft_id: draft_id, rich_message: rich_message }.merge(options)
+  @bot.api.call('sendRichMessageDraft', params)
+  
+  draft_id
+end
+
+def append_to_draft(draft_id = nil, content, **options)
+  return nil unless chat
+  
+  draft_id ||= session[:telegem_draft_id]
+  return nil unless draft_id
+  
+  rich_message = { blocks: [{ type: "paragraph", content: content }] }
+  params = { chat_id: chat.id, draft_id: draft_id, rich_message: rich_message }.merge(options)
+  @bot.api.call('sendRichMessageDraft', params)
+end
+
+def publish_draft(draft_id = nil, **options)
+  return nil unless chat
+  
+  draft_id ||= session[:telegem_draft_id]
+  return nil unless draft_id
+  
+  params = { chat_id: chat.id, draft_id: draft_id }.merge(options)
+  result = @bot.api.call('publishRichMessageDraft', params)
+  session.delete(:telegem_draft_id)
+  result
+end
+
+def cancel_draft(draft_id = nil, **options)
+  return nil unless chat
+  
+  draft_id ||= session[:telegem_draft_id]
+  return nil unless draft_id
+  
+  params = { chat_id: chat.id, draft_id: draft_id }.merge(options)
+  result = @bot.api.call('cancelRichMessageDraft', params)
+  session.delete(:telegem_draft_id)
+  result
+end
       
       def edit_message_text(text, **options)
         return nil unless message && chat

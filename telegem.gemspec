@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   # Dependencies
   spec.add_dependency "securerandom", "~> 0.1"
   spec.add_dependency "async", "~> 2.35"
-  spec.add_dependency "async-http", "~> 0.92.1"
+  spec.add_dependency "async-http", "~> 0.8"
   spec.add_dependency "pdf-reader", "~> 2.14.1"
   spec.add_dependency "docx", "~> 0.10.0"
   
