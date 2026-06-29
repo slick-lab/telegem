@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name          = "telegem"
-  spec.version       = "3.5.0"
+  spec.version       = "3.6.0"
   spec.authors       = ["zendrx"]
   spec.email         = ["ynwghosted@icloud.com"]
   
